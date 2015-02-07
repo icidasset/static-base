@@ -30,14 +30,15 @@ var gulp = require("gulp"),
 
 
 var paths = {
-  data: "data/",
+  data: "data",
   assets_static: ["assets/images", "assets/fonts"],
   assets_stylesheets_application: "assets/stylesheets/application.scss",
   assets_stylesheets_all: "assets/stylesheets/**/*.scss",
   assets_javascripts_application: "assets/javascripts/application.js",
   assets_javascripts_all: "assets/javascripts/**/*.js",
-  templates_all: "./templates/**/*.hbs",
-  templates_pages: "./templates/pages/**/*.hbs",
+  templates_all: "templates/**/*.hbs",
+  templates_pages: "templates/pages/**/*.hbs",
+  layouts: "layouts/**/*.html"
 };
 
 
@@ -219,7 +220,7 @@ function build_html_files(locale, default_locale) {
   };
 
   var data_base_object = (CONFIG.data.in_html ?
-    { data: JSON.stringify(data_object[locale]) } :
+    { data_as_json: JSON.stringify(data_object[locale]) } :
     {}
   );
 
@@ -298,6 +299,7 @@ gulp.task("build", [
 
 gulp.task("watch", ["build"], function() {
   gulp.watch(paths.data, ["build"]);
+  gulp.watch(paths.layouts, ["build"]);
   gulp.watch(paths.templates_all, ["build"]);
   gulp.watch(paths.assets_stylesheets_all, ["build"]);
   gulp.watch(paths.assets_javascripts_all, ["build"]);

@@ -1,26 +1,24 @@
 # Static Base
 
-
-## Flow
-
-1. Parse 'data' directory (yaml + markdown) -> into js object
-2. Copy images & fonts (static assets)
-3. SCSS -> include bourbon -> Sass compile/concat
-4. Javascript -> 6to5ify -> Concat
-5. Add templates and data directly to the main javascript file
-6. Compile html files
+A scaffolding for static websites, focused on sites using the history api.
 
 
+## Features
 
-## Javascript
+### General
 
-Features:
+- Data, in multiple languages, through yaml and markdown files
+- Templates, written in handlebars, compiled to html and javascript
+- Templates use layouts and partials
+
+
+### Javascript
 
 - ES6 compiled to ES5 using 6to5ify
 - Handlebars v2 `window.Handlebars`
 - Handlebars helpers are available via `window.HandlebarsHelpers`
-- Handlebars templates are available via `window.app_variable_name.templates` (see settings.yml)
-- Data is available as json in script tag
+- Handlebars templates are available via `window.app_variable_name.templates` (see config.yml)
+- Data is available as JSON in script tag or separate file
 
 
 
@@ -34,3 +32,9 @@ gulp
 # -> npm install -g node-static
 static build/
 ```
+
+
+
+## TODO
+
+- data.json file for every locale

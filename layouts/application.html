@@ -14,14 +14,22 @@
 
   {{> header}}
 
+
+  {{!-- main container --}}
   <div class="l-container">
     {{{contents}}}
   </div>
 
-  <script type="application/json">
-    {{{data}}}
-  </script>
 
+  {{!-- initial data --}}
+  {{#if data_as_json}}
+    <script type="application/json" id="initial-data">
+      {{{data_as_json}}}
+    </script>
+  {{/if}}
+
+
+  {{!-- bundled javascript --}}
   <script src="{{asset_path 'javascripts/application.js'}}"></script>
 
 
