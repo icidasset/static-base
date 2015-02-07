@@ -1,0 +1,1 @@
+Watch it, Goldie. Ahh. Ahh. No no no this sucker's electrical, but I need a nuclear reaction to generate the one point twenty-one gigawatts of electricity that I need. He's an absolute dream. I followed you.

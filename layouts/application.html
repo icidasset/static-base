@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>{{title}}</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="{{asset_path 'stylesheets/application.css'}}" />
+</head>
+<body>
+
+
+  {{> header}}
+
+  <div class="l-container">
+    {{{contents}}}
+  </div>
+
+  <script type="application/json">
+    {{{data}}}
+  </script>
+
+  <script src="{{asset_path 'javascripts/application.js'}}"></script>
+
+
+</body>
+</html>
