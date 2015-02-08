@@ -274,7 +274,7 @@ function build_html_files(locale, default_locale) {
           .metadata(underscore.extend({}, data_base_object, d))
           .use(m_layouts({
             "engine": "handlebars",
-            "default": "application.html"
+            "default": "application.hbs"
           }))
       ).pipe(rename(prefix + route + "/index.html"));
     }));
