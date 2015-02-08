@@ -70,13 +70,23 @@ function traverse(obj, path_array) {
 }
 
 
-function page_data(locale, file) {
-  var p = file.path.replace(file.cwd + "/templates/pages/", "");
+function page_path(file) {
+  var path = file.path.replace(file.cwd + "/templates/pages/", "")
+    .replace(/(^\/|\/$)+/g, "")
+    .split("/");
+
+  path[path.length - 1] = basename(path[path.length - 1]);
+  path = path.join("/");
+
+  return path;
+}
+
+
+function page_data(locale, page_path) {
   var d = data_object[locale].pages;
 
-  p.split("/").forEach(function(s) {
-    s = basename(s);
-    if (s !== "") d = d[s];
+  page_path.split("/").forEach(function(s) {
+    d = d[s];
   });
 
   return d;
@@ -97,18 +107,24 @@ var BUILD_DIR = CONFIG.build_directory;
 //
 var data_paths = fs.existsSync(paths.data) ? walkdir.sync(paths.data) : [];
 var data_object = {};
-var locales;
 
 data_paths.forEach(function(p) {
   var match_yaml = p.match(/\.yml$/);
   var match_md = p.match(/\.md$/);
-  var relative_path, base, split, obj_pointer;
+  var relative_path, base, split, obj_pointer, parent;
+
+  relative_path = p.replace(__dirname + "/data/", "").replace(/\.\w+$/, "");
+  split = relative_path.split("/");
+  base = split[split.length - 1];
 
   if (match_yaml || match_md) {
-    relative_path = p.replace(__dirname + "/data/", "").replace(/\.\w+$/, "");
-    base = basename(relative_path);
-    split = relative_path.split("/");
     obj_pointer = traverse(data_object, split);
+    parent = split.length > 1 ? traverse(data_object, split.slice(0, split.length - 1)) : null;
+
+    if (parent) {
+      parent._children = parent._children || [];
+      if (!underscore.contains(parent._children, base)) parent._children.push(base);
+    }
 
     if (match_yaml) {
       underscore.extend(obj_pointer, YAML.load(p));
@@ -117,12 +133,20 @@ data_paths.forEach(function(p) {
       obj_pointer.parsed_markdown = markdown.toHTML(fs.readFileSync(p).toString());
       obj_pointer._flags.is_markdown = true;
     }
+  } else if (fs.lstatSync(p).isDirectory()) {
+    obj_pointer = traverse(data_object, split);
+    obj_pointer._flags.is_directory = true;
   }
 });
 
-locales = Object.keys(data_object).filter(function(k) {
+data_object._locales = Object.keys(data_object).filter(function(k) {
   var d = data_object[k];
   if (!d._flags.is_markdown && !d._flags.is_yaml) return true;
+});
+
+// data manipulations
+require("./data_manipulations").forEach(function(manipulation_fn) {
+  manipulation_fn.call(data_object);
 });
 
 
@@ -204,7 +228,7 @@ gulp.task("build_application_javascript", ["build_application_stylesheet"], func
 //  HTML
 //
 gulp.task("build_html_files", ["build_application_javascript"], function() {
-  var streams = locales.map(function(locale) {
+  var streams = data_object._locales.map(function(locale) {
     return build_html_files(locale, CONFIG.locales.default);
   });
 
@@ -224,10 +248,15 @@ function build_html_files(locale, default_locale) {
     {}
   );
 
+  underscore.extend(data_base_object, {
+    _all: data_object[locale]
+  });
+
   return gulp.src(paths.templates_pages)
     // compile handlebars templates
     .pipe(foreach(function(stream, file) {
-      var d = page_data(locale, file);
+      var p = page_path(file);
+      var d = page_data(locale, p);
 
       return stream.pipe(compile_handlebars(
         d, handlebars_compile_options
@@ -235,18 +264,19 @@ function build_html_files(locale, default_locale) {
     }))
     // build templates + move to new path
     .pipe(foreach(function(stream, file) {
-      var d = page_data(locale, file);
-      var page_route = d.route.replace(/(^\/|\/$)+/g, "");
+      var p = page_path(file);
+      var d = page_data(locale, p);
       var prefix = (locale == default_locale ? "" : locale + "/");
+      var route = data_base_object._all._routing_table[p].route;
 
       return stream.pipe(
         gulpsmith()
-          .metadata(underscore.extend(data_base_object, d))
+          .metadata(underscore.extend({}, data_base_object, d))
           .use(m_layouts({
             "engine": "handlebars",
             "default": "application.html"
           }))
-      ).pipe(rename(prefix + page_route + "/index.html"));
+      ).pipe(rename(prefix + route + "/index.html"));
     }));
 }
 
@@ -260,7 +290,7 @@ gulp.task("clone_assets", [
 ], function(clb) {
   var streams = [];
 
-  locales.forEach(function(l) {
+  data_object._locales.forEach(function(l) {
     if (l !== CONFIG.locales.default) {
       var stream = gulp
         .src(BUILD_DIR + "/assets/**/*", { base: BUILD_DIR })

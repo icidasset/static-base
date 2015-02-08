@@ -12,12 +12,12 @@ function factory() { return {
 
 
   asset_path: function(path_from_assets_directory) {
-    var route = this.route;
+    var route = this._route;
 
-    if (!route) {
-      return path_from_assets_directory;
+    if (!route || route.length === 0) {
+      return "assets/" + path_from_assets_directory;
     } else {
-      var split = route.replace(/(^\/|\/$)+/g, "").split("/");
+      var split = route.split("/");
       var path_prefix = "";
 
       for (var i=0, j=split.length; i<j; ++i) {
