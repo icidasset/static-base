@@ -21,9 +21,17 @@
   </div>
 
 
+  {{!-- initial state --}}
+  <script id="initial-state" type="application/json">
+    {
+      "initial_route": "{{_route}}"
+    }
+  </script>
+
+
   {{!-- initial data --}}
   {{#if data_as_json}}
-    <script type="application/json" id="initial-data">
+    <script id="initial-data" type="application/json">
       {{{data_as_json}}}
     </script>
   {{/if}}
