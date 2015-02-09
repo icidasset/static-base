@@ -206,7 +206,7 @@ gulp.task("build_application_javascript", ["build_application_stylesheet"], func
     .pipe(gulp_handlebars({ handlebars: handlebars }))
     .pipe(wrap("Handlebars.template(<%= contents %>)"))
     .pipe(declare({
-      namespace: CONFIG.javascript.app_variable_name + ".templates",
+      namespace: CONFIG.javascript.app_variable_name,
       noRedeclare: true,
       processName: declare.processNameByPath
     }))
@@ -214,7 +214,8 @@ gulp.task("build_application_javascript", ["build_application_stylesheet"], func
 
   // main javascript
   var js_stream = gulp.src(paths.assets_javascripts_application)
-    .pipe(browserified);
+    .pipe(browserified)
+    .on("error", swallow_error);
 
   // build
   return merge(handlebars_stream, templates_stream, js_stream)

@@ -17,6 +17,7 @@ module.exports = [
         var route = route_prefix + (path == "index" ? "" : (child_obj_route || c));
 
         table[path] = {
+          page_path: path,
           route: route
         };
 
