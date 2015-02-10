@@ -1,6 +1,6 @@
 # Static Base
 
-A scaffolding for static websites, focused on sites using the history api.
+Scaffolding for static websites, focused on sites using the history api.
 
 
 ## Features
