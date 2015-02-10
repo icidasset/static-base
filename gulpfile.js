@@ -111,6 +111,7 @@ var BUILD_DIR = CONFIG.build_directory;
 var data_paths = fs.existsSync(paths.data) ? walkdir.sync(paths.data) : [];
 var data_object = {};
 
+
 data_paths.forEach(function(p) {
   var match_yaml = p.match(/\.yml$/);
   var match_md = p.match(/\.md$/);
@@ -142,10 +143,15 @@ data_paths.forEach(function(p) {
   }
 });
 
+
 data_object._locales = Object.keys(data_object).filter(function(k) {
   var d = data_object[k];
-  if (!d._flags.is_markdown && !d._flags.is_yaml) return true;
+  if (!d._flags.is_markdown && !d._flags.is_yaml) {
+    d._locale = k;
+    return true;
+  }
 });
+
 
 // data manipulations
 require("./data_manipulations").forEach(function(manipulation_fn) {
@@ -265,7 +271,8 @@ function build_html_files(locale, default_locale) {
       var d = page_data(locale, p);
 
       return stream.pipe(compile_handlebars(
-        d, handlebars_compile_options
+        underscore.extend({}, data_base_object, d),
+        handlebars_compile_options
       ));
     }))
     // build templates + move to new path

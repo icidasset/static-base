@@ -5,19 +5,21 @@ import _ from "../vendor/underscore";
 //
 //  Routes
 //
-Object.keys(App.data._routing_table).forEach(function(k) {
-  var table_item = App.data._routing_table[k];
-  var route = table_item.route;
+function setup_routes() {
+  Object.keys(App.data._routing_table).forEach(function(k) {
+    var table_item = App.data._routing_table[k];
+    var route = table_item.route;
 
-  page(
-    "/" + route,
-    function(route, next) {
-      App.state.route_page_path = table_item.page_path;
-      next();
-    },
-    all_routes
-  );
-});
+    page(
+      "/" + route,
+      function(route, next) {
+        App.state.route_page_path = table_item.page_path;
+        next();
+      },
+      all_routes
+    );
+  });
+}
 
 
 function all_routes(route) {
@@ -66,3 +68,10 @@ Gator(document).on("click", "[href]", function(e) {
 function relative_to_absolute(href) {
   return href.replace(/\.\.\//g, "");
 }
+
+
+
+//
+//  Export
+//
+export default setup_routes;
