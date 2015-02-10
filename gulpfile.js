@@ -5,6 +5,7 @@ var gulp = require("gulp"),
     compile_handlebars = require("gulp-compile-handlebars"),
     concat = require("gulp-concat"),
     declare = require("gulp-declare"),
+    file = require("gulp-file"),
     foreach = require("gulp-foreach"),
     gulp_handlebars = require("gulp-handlebars"),
     rename = require("gulp-rename"),
@@ -26,7 +27,9 @@ var gulp = require("gulp"),
     YAML = require("yamljs"),
 
     gulpsmith = require("gulpsmith"),
-    m_layouts = require("metalsmith-layouts");
+    m_layouts = require("metalsmith-layouts"),
+
+    _is_building = false;
 
 
 var paths = {
@@ -157,6 +160,8 @@ require("./data_manipulations").forEach(function(manipulation_fn) {
 gulp.task("copy_static_assets", ["clean"], function() {
   var merge_args = [];
 
+  _is_building = true;
+
   paths.assets_static.forEach(function(s) {
     var stream = gulp
       .src(s + "/**/*", { base: s })
@@ -197,8 +202,8 @@ gulp.task("build_application_javascript", ["build_application_stylesheet"], func
 
   // handlebars
   var handlebars_stream = gulp.src([
-    "./node_modules/handlebars/dist/handlebars.js",
-    "./handlebars_helpers.js"
+    "node_modules/handlebars/dist/handlebars.js",
+    "handlebars_helpers.js"
   ]).pipe(concat("handlebars.js"));
 
   // templates
@@ -240,7 +245,7 @@ gulp.task("build_html_files", ["build_application_javascript"], function() {
 
 function build_html_files(locale, default_locale) {
   var handlebars_compile_options = {
-    batch: ["./templates/partials"],
+    batch: ["templates/partials"],
     helpers: handlebars_helpers
   };
 
@@ -284,11 +289,29 @@ function build_html_files(locale, default_locale) {
 
 
 //
+//  Data.json
+//
+gulp.task("build_data_json_files", ["build_html_files"], function() {
+  var file_streams = [];
+
+  data_object._locales.forEach(function(locale) {
+    file_streams.push(file(
+      locale + ".json",
+      JSON.stringify(data_object[locale]),
+      { src: true }
+    ));
+  });
+
+  return merge.apply(merge, file_streams)
+    .pipe(gulp.dest(BUILD_DIR + "/data"));
+});
+
+
+
+//
 //  Clone assets
 //
-gulp.task("clone_assets", [
-  "build_html_files"
-], function(clb) {
+gulp.task("clone_assets", ["build_data_json_files"], function(clb) {
   var streams = [];
 
   data_object._locales.forEach(function(l) {
@@ -319,21 +342,25 @@ gulp.task("clean", function(clb) {
 
 
 gulp.task("build", [
-  "clean",
-  "copy_static_assets",
-  "build_application_stylesheet",
-  "build_application_javascript",
-  "build_html_files",
   "clone_assets"
-]);
+], function(clb) {
+  setTimeout(function() {
+    _is_building = false;
+  }, 1000);
+  clb();
+});
 
 
 gulp.task("watch", ["build"], function() {
-  gulp.watch(paths.data, ["build"]);
-  gulp.watch(paths.layouts, ["build"]);
-  gulp.watch(paths.templates_all, ["build"]);
-  gulp.watch(paths.assets_stylesheets_all, ["build"]);
-  gulp.watch(paths.assets_javascripts_all, ["build"]);
+  gulp.watch(underscore.flatten([
+    paths.data,
+    paths.layouts,
+    paths.templates_all,
+    paths.assets_stylesheets_all,
+    paths.assets_javascripts_all
+  ]), function(event) {
+    if (!_is_building) gulp.run("build");
+  });
 });
 
 

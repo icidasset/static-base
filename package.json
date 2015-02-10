@@ -8,6 +8,7 @@
     "gulp-compile-handlebars": "^0.4.4",
     "gulp-concat": "^2.4.3",
     "gulp-declare": "^0.3.0",
+    "gulp-file": "^0.2.0",
     "gulp-foreach": "^0.1.0",
     "gulp-handlebars": "^3.0.1",
     "gulp-rename": "^1.2.0",
