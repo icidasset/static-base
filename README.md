@@ -39,6 +39,6 @@ static build/
 
 ### Routing
 
-The tree structure of `data/:locale/pages` is converted into a routing table that will be used to build the html files and is also used to setup the routing in javascript. For example, `about/origin.yml` will have the route `about/origin/`. This can be overridden by adding a __route property__ in the yaml, the __fr__ locale serves as an example for this. A routing table is build for every locale and is stored in its data object as `_routing_table`. _PS. The file and directory names should be the same for every locale and should also match the tree structure for the templates_.
+The tree structure of `data/:locale/pages` is converted into a routing table that will be used to build the html files and is also used to setup the routing in javascript. For example, `about/origin.yml` will have the route `about/origin/`. This can be overridden by adding a __route property__ in the yaml, the __fr__ locale serves as an example for this. A routing table is build for every locale and is stored in its data object as `_routing_table`. _Note that the file and directory names should be the same for every locale and should also match the tree structure for the templates_.
 
 The base of the routes is calculated based on the __initial route__, which is passed to javascript by the `initial-state` JSON object. The JSON is located in the application layout.
