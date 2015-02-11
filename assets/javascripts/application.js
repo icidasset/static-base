@@ -3,7 +3,6 @@ import "./vendor/fetch";
 import "./vendor/gator";
 import "./vendor/isarray";
 import "./vendor/object-observe-lite";
-import "./vendor/observe-notifier";
 import "./vendor/path-to-regexp";
 import "./vendor/skate";
 
