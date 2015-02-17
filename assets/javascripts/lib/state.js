@@ -1,4 +1,3 @@
-import _ from "../vendor/underscore";
 import ObserveNotifier from "../vendor/observe-notifier";
 
 

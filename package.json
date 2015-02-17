@@ -1,5 +1,11 @@
 {
-  "dependencies": {},
+  "dependencies": {
+    "es6-promise": "^2.0.1",
+    "fetch-ponyfill": "^0.6.0",
+    "object.observe": "^0.2.2",
+    "page": "^1.6.1",
+    "skatejs": "^0.12.0"
+  },
   "devDependencies": {
     "6to5ify": "^4.1.0",
     "browserify": "^7.1.0",

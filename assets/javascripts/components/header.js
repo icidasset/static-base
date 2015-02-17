@@ -1,6 +1,3 @@
-import _ from "../vendor/underscore";
-
-
 skate("header", {
 
   created: function(el) {

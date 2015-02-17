@@ -1,10 +1,3 @@
-import page from "../vendor/page";
-import _ from "../vendor/underscore";
-
-
-//
-//  Routes
-//
 function setup_routes() {
   Object.keys(App.data._routing_table).forEach(function(k) {
     var table_item = App.data._routing_table[k];

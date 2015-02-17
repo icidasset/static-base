@@ -1,10 +1,4 @@
-import "./vendor/es6-promise";
-import "./vendor/fetch";
 import "./vendor/gator";
-import "./vendor/isarray";
-import "./vendor/object-observe-lite";
-import "./vendor/path-to-regexp";
-import "./vendor/skate";
 
 import "./lib/environment";
 import "./lib/helpers";

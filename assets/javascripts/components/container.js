@@ -1,6 +1,3 @@
-import _ from "../vendor/underscore";
-
-
 skate("container", {
 
   created: function(el) {

@@ -1,9 +1,3 @@
-import _ from "../vendor/underscore";
-
-
-//
-//  Namespace
-//
 window.App = App || {};
 
 

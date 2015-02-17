@@ -223,13 +223,17 @@ gulp.task("build_application_javascript", ["build_application_stylesheet"], func
     }))
     .pipe(concat("templates.js"));
 
+  // vendor
+  var vendor_stream = gulp.src(CONFIG.javascript.vendor_paths)
+    .pipe(concat("vendor.js"));
+
   // main javascript
   var js_stream = gulp.src(paths.assets_javascripts_application)
     .pipe(browserified)
     .on("error", swallow_error);
 
   // build
-  return merge(handlebars_stream, templates_stream, js_stream)
+  return merge(handlebars_stream, templates_stream, vendor_stream, js_stream)
     .pipe(concat("application.js"))
     .pipe(gulp.dest(BUILD_DIR + "/assets/javascripts"));
 });
