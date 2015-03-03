@@ -12,16 +12,15 @@ var gulp = require("gulp"),
     sass = require("gulp-sass"),
     wrap = require("gulp-wrap"),
 
-    to5ify = require("6to5ify"),
+    babelify = require("babelify"),
     browserify = require("browserify"),
-    bourbon = require("node-bourbon"),
     del = require("del"),
     fs = require("fs"),
     handlebars = require("handlebars"),
     handlebars_helpers = require("./handlebars_helpers"),
     markdown = require("markdown").markdown,
     merge = require("merge-stream"),
-    transform = require("vinyl-transform"),
+    through2 = require("through2"),
     underscore = require("underscore")._,
     walkdir = require("walkdir"),
     YAML = require("yamljs"),
@@ -200,13 +199,6 @@ gulp.task("build_application_stylesheet", ["copy_static_assets"], function() {
 //  Javascripts
 //
 gulp.task("build_application_javascript", ["build_application_stylesheet"], function() {
-  var browserified = transform(function(filename) {
-    var b = browserify(filename);
-    b.transform(to5ify);
-    return b.bundle();
-  });
-
-  // handlebars
   var handlebars_stream = gulp.src([
     "node_modules/handlebars/dist/handlebars.js",
     "handlebars_helpers.js"
@@ -229,8 +221,14 @@ gulp.task("build_application_javascript", ["build_application_stylesheet"], func
 
   // main javascript
   var js_stream = gulp.src(paths.assets_javascripts_application)
-    .pipe(browserified)
-    .on("error", swallow_error);
+    .pipe(through2.obj(function(file, enc, next) {
+      browserify(file.path)
+        .transform(babelify)
+        .bundle(function(err, res) {
+          file.contents = res; // assumes file.contents is a buffer
+          next(null, file);
+        });
+    }));
 
   // build
   return merge(handlebars_stream, templates_stream, vendor_stream, js_stream)

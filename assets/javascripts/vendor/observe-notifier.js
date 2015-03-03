@@ -1,4 +1,4 @@
-/* globals define, exports, require */
+/* globals define, exports, require, module */
 
 (function(root, factory) {
   if (typeof define === "function" && define.amd) {
@@ -105,14 +105,20 @@
 
   ObserveNotifier.prototype.off = function(key, callback) {
     var obj = this.path_observers[key];
+
     if (!obj) return;
+    var new_obj = [];
 
     for (var i=0, j=obj.length; i<j; ++i) {
       if (obj[i].callback === callback || !callback) {
         Object.unobserve(this.obj, obj[i].observer);
         obj[i] = null;
+      } else {
+        new_obj.push(obj[i]);
       }
     }
+
+    this.path_observers[key] = new_obj;
   };
 
 

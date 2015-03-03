@@ -44,12 +44,14 @@ page.base(base());
 //
 //  Intercept internal link clicks
 //
-Gator(document).on("click", "[href]", function(e) {
-  var href = e.target.getAttribute("href");
+document.addEventListener("click", function(event) {
+  if (event.target.tagName.toLowerCase() === "a") {
+    var href = event.target.getAttribute("href");
 
-  if (!href.match(/^\w+\:\/\//)) {
-    page.show("/" + relative_to_absolute(href));
-    e.preventDefault();
+    if (href && !href.match(/^\w+\:\/\//)) {
+      page.show("/" + relative_to_absolute(href));
+      event.preventDefault();
+    }
   }
 });
 

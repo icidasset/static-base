@@ -1,5 +1,3 @@
-import "./vendor/gator";
-
 import "./lib/environment";
 import "./lib/helpers";
 import "./lib/state";
