@@ -29,6 +29,9 @@ Scaffolding for static websites, focused on sites using the history api.
 # build & watch
 gulp
 
+# production build (minified js & css)
+gulp build --production
+
 # static server
 # -> npm install -g node-static
 static build/

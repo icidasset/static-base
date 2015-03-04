@@ -8,10 +8,13 @@ var gulp = require("gulp"),
     file = require("gulp-file"),
     foreach = require("gulp-foreach"),
     gulp_handlebars = require("gulp-handlebars"),
+    gulp_if = require("gulp-if"),
     rename = require("gulp-rename"),
     sass = require("gulp-sass"),
+    uglify = require("gulp-uglify"),
     wrap = require("gulp-wrap"),
 
+    argv = require("yargs").argv,
     babelify = require("babelify"),
     browserify = require("browserify"),
     del = require("del"),
@@ -187,7 +190,7 @@ gulp.task("build_application_stylesheet", ["copy_static_assets"], function() {
   return gulp.src(paths.assets_stylesheets_application)
     .pipe(sass({
       includePaths: require("node-bourbon").includePaths,
-      outputStyle: "nested"
+      outputStyle: argv.production ? "compressed" : "nested"
     }))
     .on("error", swallow_error)
     .pipe(gulp.dest(BUILD_DIR + "/assets/stylesheets"));
@@ -233,6 +236,7 @@ gulp.task("build_application_javascript", ["build_application_stylesheet"], func
   // build
   return merge(handlebars_stream, templates_stream, vendor_stream, js_stream)
     .pipe(concat("application.js"))
+    .pipe(gulp_if(argv.production, uglify()))
     .pipe(gulp.dest(BUILD_DIR + "/assets/javascripts"));
 });
 
