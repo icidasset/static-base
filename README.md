@@ -15,8 +15,8 @@ Scaffolding for static websites, focused on sites using the history api.
 ### Javascript
 
 - Browserify
-- ES6 compiled to ES5 using 6to5ify
-- Handlebars v2 `window.Handlebars`
+- ES6 compiled to ES5 using [babel.js](https://babeljs.io/)
+- Handlebars v3 `window.Handlebars`
 - Handlebars helpers are available via `window.HandlebarsHelpers`
 - Handlebars templates are available via `window.app_variable_name.templates` (see config.yml)
 - Data is available as JSON in script tag or separate file
@@ -39,7 +39,7 @@ static build/
 
 ### Javascript
 
-The javascript is compiled through browserify + the 6to5 plugin.
+The javascript is compiled through browserify + the babel.js plugin.
 But this sometimes generates conflicts with some vendor scripts, so
 I added a way to add vendor scripts that are not run through browserify.
 In the `config.yml` file there is an array `javascript.vendor_paths`,
