@@ -1,4 +1,4 @@
-App.helpers = {
+export default {
 
   traverse_object: function(path, obj, split_by) {
     var split = path.split(split_by || "/");

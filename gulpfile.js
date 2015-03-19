@@ -15,15 +15,12 @@ var gulp = require("gulp"),
     wrap = require("gulp-wrap"),
 
     argv = require("yargs").argv,
-    babelify = require("babelify"),
-    browserify = require("browserify"),
     del = require("del"),
     fs = require("fs"),
     handlebars = require("handlebars"),
     handlebars_helpers = require("./handlebars_helpers"),
     markdown = require("markdown").markdown,
     merge = require("merge-stream"),
-    through2 = require("through2"),
     underscore = require("underscore")._,
     walkdir = require("walkdir"),
     YAML = require("yamljs"),
@@ -201,7 +198,7 @@ gulp.task("build_application_stylesheet", ["copy_static_assets"], function() {
 //
 //  Javascripts
 //
-gulp.task("build_application_javascript", ["build_application_stylesheet"], function() {
+gulp.task("build_javascript", ["build_application_stylesheet"], function() {
   var handlebars_stream = gulp.src([
     "node_modules/handlebars/dist/handlebars.js",
     "handlebars_helpers.js"
@@ -218,26 +215,16 @@ gulp.task("build_application_javascript", ["build_application_stylesheet"], func
     }))
     .pipe(concat("templates.js"));
 
-  // vendor
-  var vendor_stream = gulp.src(CONFIG.javascript.vendor_paths)
-    .pipe(concat("vendor.js"));
-
-  // main javascript
-  var js_stream = gulp.src(paths.assets_javascripts_application)
-    .pipe(through2.obj(function(file, enc, next) {
-      browserify(file.path)
-        .transform(babelify)
-        .bundle(function(err, res) {
-          file.contents = res; // assumes file.contents is a buffer
-          next(null, file);
-        });
-    }));
+  // jspm config
+  var jspm_config_stream = gulp.src("assets/javascripts/jspm-config.js");
 
   // build
-  return merge(handlebars_stream, templates_stream, vendor_stream, js_stream)
-    .pipe(concat("application.js"))
+  return merge(handlebars_stream, templates_stream, jspm_config_stream)
     .pipe(gulp_if(argv.production, uglify()))
     .pipe(gulp.dest(BUILD_DIR + "/assets/javascripts"));
+
+  // ./node_modules/.bin/jspm install
+  // ./node_modules/.bin/jspm bundle-sfx assets/javascripts/application build/assets/javascripts/application.js
 });
 
 
@@ -245,7 +232,7 @@ gulp.task("build_application_javascript", ["build_application_stylesheet"], func
 //
 //  HTML
 //
-gulp.task("build_html_files", ["build_application_javascript"], function() {
+gulp.task("build_html_files", ["build_javascript"], function() {
   var streams = data_object._locales.map(function(locale) {
     return build_html_files(locale, CONFIG.locales.default);
   });

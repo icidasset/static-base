@@ -26,15 +26,11 @@ Scaffolding for static websites, focused on sites using the history api.
 ## Development
 
 ```bash
-# build & watch
-gulp
-
-# production build (minified js & css)
-gulp build --production
-
-# static server
-# -> npm install -g node-static
-static build/
+npm install
+npm run gulp-build
+npm run jspm-install
+npm run jspm-build
+npm run server
 ```
 
 ### Javascript
