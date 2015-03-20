@@ -11,11 +11,11 @@ var gulp = require("gulp"),
     gulp_if = require("gulp-if"),
     rename = require("gulp-rename"),
     sass = require("gulp-sass"),
+    shell = require("gulp-shell"),
     uglify = require("gulp-uglify"),
     wrap = require("gulp-wrap"),
 
     argv = require("yargs").argv,
-    del = require("del"),
     fs = require("fs"),
     handlebars = require("handlebars"),
     handlebars_helpers = require("./handlebars_helpers"),
@@ -26,9 +26,7 @@ var gulp = require("gulp"),
     YAML = require("yamljs"),
 
     gulpsmith = require("gulpsmith"),
-    m_layouts = require("metalsmith-layouts"),
-
-    _is_building = false;
+    metalsmith_layouts = require("metalsmith-layouts");
 
 
 var paths = {
@@ -40,7 +38,7 @@ var paths = {
   assets_javascripts_all: "assets/javascripts/**/*.js",
   templates_all: "templates/**/*.hbs",
   templates_pages: "templates/pages/**/*.hbs",
-  layouts: "layouts/**/*.html"
+  layouts: "layouts/**/*.hbs"
 };
 
 
@@ -162,10 +160,8 @@ require("./data_manipulations").forEach(function(manipulation_fn) {
 //
 //  Copy images & fonts
 //
-gulp.task("copy_static_assets", ["clean"], function() {
+gulp.task("copy_static_assets", function() {
   var merge_args = [];
-
-  _is_building = true;
 
   paths.assets_static.forEach(function(s) {
     var stream = gulp
@@ -183,7 +179,7 @@ gulp.task("copy_static_assets", ["clean"], function() {
 //
 //  Stylesheets
 //
-gulp.task("build_application_stylesheet", ["copy_static_assets"], function() {
+gulp.task("build_css", function() {
   return gulp.src(paths.assets_stylesheets_application)
     .pipe(sass({
       includePaths: require("node-bourbon").includePaths,
@@ -198,7 +194,7 @@ gulp.task("build_application_stylesheet", ["copy_static_assets"], function() {
 //
 //  Javascripts
 //
-gulp.task("build_javascript", ["build_application_stylesheet"], function() {
+gulp.task("build_js", function() {
   var handlebars_stream = gulp.src([
     "node_modules/handlebars/dist/handlebars.js",
     "handlebars_helpers.js"
@@ -222,17 +218,20 @@ gulp.task("build_javascript", ["build_application_stylesheet"], function() {
   return merge(handlebars_stream, templates_stream, jspm_config_stream)
     .pipe(gulp_if(argv.production, uglify()))
     .pipe(gulp.dest(BUILD_DIR + "/assets/javascripts"));
-
-  // ./node_modules/.bin/jspm install
-  // ./node_modules/.bin/jspm bundle-sfx assets/javascripts/application build/assets/javascripts/application.js
 });
+
+
+gulp.task("build_jspm", shell.task([
+  "./node_modules/.bin/jspm install",
+  "./node_modules/.bin/jspm bundle-sfx assets/javascripts/application build/assets/javascripts/application.js"
+]));
 
 
 
 //
 //  HTML
 //
-gulp.task("build_html_files", ["build_javascript"], function() {
+gulp.task("build_html", function() {
   var streams = data_object._locales.map(function(locale) {
     return build_html_files(locale, CONFIG.locales.default);
   });
@@ -278,7 +277,7 @@ function build_html_files(locale, default_locale) {
       return stream.pipe(
         gulpsmith()
           .metadata(underscore.extend({}, data_base_object, d))
-          .use(m_layouts({
+          .use(metalsmith_layouts({
             "engine": "handlebars",
             "default": "application.hbs"
           }))
@@ -291,7 +290,7 @@ function build_html_files(locale, default_locale) {
 //
 //  Data.json
 //
-gulp.task("build_data_json_files", ["build_html_files"], function() {
+gulp.task("build_data_json_files", ["build_html"], function() {
   var file_streams = [];
 
   data_object._locales.forEach(function(locale) {
@@ -311,7 +310,14 @@ gulp.task("build_data_json_files", ["build_html_files"], function() {
 //
 //  Clone assets
 //
-gulp.task("clone_assets", ["build_data_json_files"], function(clb) {
+gulp.task("clone_assets", [
+  "copy_static_assets",
+  "build_css",
+  "build_js",
+  "build_jspm",
+  "build_html",
+  "build_data_json_files"
+], function(clb) {
   var streams = [];
 
   data_object._locales.forEach(function(l) {
@@ -336,32 +342,14 @@ gulp.task("clone_assets", ["build_data_json_files"], function(clb) {
 //
 //  Other tasks
 //
-gulp.task("clean", function(clb) {
-  del([BUILD_DIR + "/**"], { force: true }, clb);
-});
+gulp.task("clean", shell.task(
+  "rm -rf ./build"
+));
 
 
 gulp.task("build", [
   "clone_assets"
-], function(clb) {
-  setTimeout(function() {
-    _is_building = false;
-  }, 1000);
-  clb();
-});
+]);
 
 
-gulp.task("watch", ["build"], function() {
-  gulp.watch(underscore.flatten([
-    paths.data,
-    paths.layouts,
-    paths.templates_all,
-    paths.assets_stylesheets_all,
-    paths.assets_javascripts_all
-  ]), function(event) {
-    if (!_is_building) gulp.run("build");
-  });
-});
-
-
-gulp.task("default", ["watch"]);
+gulp.task("default", ["build"]);
