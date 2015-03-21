@@ -11,27 +11,22 @@ var gulp = require("gulp"),
     gulp_if = require("gulp-if"),
     rename = require("gulp-rename"),
     sass = require("gulp-sass"),
+    shell = require("gulp-shell"),
     uglify = require("gulp-uglify"),
     wrap = require("gulp-wrap"),
 
     argv = require("yargs").argv,
-    babelify = require("babelify"),
-    browserify = require("browserify"),
-    del = require("del"),
     fs = require("fs"),
     handlebars = require("handlebars"),
     handlebars_helpers = require("./handlebars_helpers"),
     markdown = require("markdown").markdown,
     merge = require("merge-stream"),
-    through2 = require("through2"),
     underscore = require("underscore")._,
     walkdir = require("walkdir"),
     YAML = require("yamljs"),
 
     gulpsmith = require("gulpsmith"),
-    m_layouts = require("metalsmith-layouts"),
-
-    _is_building = false;
+    metalsmith_layouts = require("metalsmith-layouts");
 
 
 var paths = {
@@ -43,7 +38,7 @@ var paths = {
   assets_javascripts_all: "assets/javascripts/**/*.js",
   templates_all: "templates/**/*.hbs",
   templates_pages: "templates/pages/**/*.hbs",
-  layouts: "layouts/**/*.html"
+  layouts: "layouts/**/*.hbs"
 };
 
 
@@ -165,10 +160,8 @@ require("./data_manipulations").forEach(function(manipulation_fn) {
 //
 //  Copy images & fonts
 //
-gulp.task("copy_static_assets", ["clean"], function() {
+gulp.task("copy_static_assets", function() {
   var merge_args = [];
-
-  _is_building = true;
 
   paths.assets_static.forEach(function(s) {
     var stream = gulp
@@ -186,7 +179,7 @@ gulp.task("copy_static_assets", ["clean"], function() {
 //
 //  Stylesheets
 //
-gulp.task("build_application_stylesheet", ["copy_static_assets"], function() {
+gulp.task("build_css", function() {
   return gulp.src(paths.assets_stylesheets_application)
     .pipe(sass({
       includePaths: require("node-bourbon").includePaths,
@@ -201,14 +194,19 @@ gulp.task("build_application_stylesheet", ["copy_static_assets"], function() {
 //
 //  Javascripts
 //
-gulp.task("build_application_javascript", ["build_application_stylesheet"], function() {
-  var handlebars_stream = gulp.src([
+gulp.task("build_js", function() {
+  var streams = [], s;
+
+  // handlebars
+  s = gulp.src([
     "node_modules/handlebars/dist/handlebars.js",
     "handlebars_helpers.js"
   ]).pipe(concat("handlebars.js"));
 
+  streams.push(s);
+
   // templates
-  var templates_stream = gulp.src(paths.templates_all)
+  s = gulp.src(paths.templates_all)
     .pipe(gulp_handlebars({ handlebars: handlebars }))
     .pipe(wrap("Handlebars.template(<%= contents %>)"))
     .pipe(declare({
@@ -218,34 +216,31 @@ gulp.task("build_application_javascript", ["build_application_stylesheet"], func
     }))
     .pipe(concat("templates.js"));
 
-  // vendor
-  var vendor_stream = gulp.src(CONFIG.javascript.vendor_paths)
-    .pipe(concat("vendor.js"));
+  streams.push(s);
 
-  // main javascript
-  var js_stream = gulp.src(paths.assets_javascripts_application)
-    .pipe(through2.obj(function(file, enc, next) {
-      browserify(file.path)
-        .transform(babelify)
-        .bundle(function(err, res) {
-          file.contents = res; // assumes file.contents is a buffer
-          next(null, file);
-        });
-    }));
+  // jspm config
+  s = gulp.src("./jspm-config.js");
+
+  streams.push(s);
 
   // build
-  return merge(handlebars_stream, templates_stream, vendor_stream, js_stream)
-    .pipe(concat("application.js"))
+  return merge.apply(merge, streams)
     .pipe(gulp_if(argv.production, uglify()))
     .pipe(gulp.dest(BUILD_DIR + "/assets/javascripts"));
 });
+
+
+gulp.task("build_jspm", shell.task([
+  "./node_modules/.bin/jspm install",
+  "./node_modules/.bin/jspm bundle-sfx assets/javascripts/application build/assets/javascripts/application.js"
+]));
 
 
 
 //
 //  HTML
 //
-gulp.task("build_html_files", ["build_application_javascript"], function() {
+gulp.task("build_html", function() {
   var streams = data_object._locales.map(function(locale) {
     return build_html_files(locale, CONFIG.locales.default);
   });
@@ -261,10 +256,9 @@ function build_html_files(locale, default_locale) {
     helpers: handlebars_helpers
   };
 
-  var data_base_object = (CONFIG.data.in_html ?
-    { data_as_json: JSON.stringify(data_object[locale]) } :
-    {}
-  );
+  var data_base_object = {
+    data_as_json: JSON.stringify(data_object[locale])
+  };
 
   underscore.extend(data_base_object, {
     _all: data_object[locale]
@@ -291,7 +285,7 @@ function build_html_files(locale, default_locale) {
       return stream.pipe(
         gulpsmith()
           .metadata(underscore.extend({}, data_base_object, d))
-          .use(m_layouts({
+          .use(metalsmith_layouts({
             "engine": "handlebars",
             "default": "application.hbs"
           }))
@@ -304,7 +298,7 @@ function build_html_files(locale, default_locale) {
 //
 //  Data.json
 //
-gulp.task("build_data_json_files", ["build_html_files"], function() {
+gulp.task("build_data_json_files", ["build_html"], function() {
   var file_streams = [];
 
   data_object._locales.forEach(function(locale) {
@@ -324,7 +318,14 @@ gulp.task("build_data_json_files", ["build_html_files"], function() {
 //
 //  Clone assets
 //
-gulp.task("clone_assets", ["build_data_json_files"], function(clb) {
+gulp.task("clone_assets", [
+  "copy_static_assets",
+  "build_css",
+  "build_js",
+  "build_jspm",
+  "build_html",
+  "build_data_json_files"
+], function(clb) {
   var streams = [];
 
   data_object._locales.forEach(function(l) {
@@ -349,19 +350,14 @@ gulp.task("clone_assets", ["build_data_json_files"], function(clb) {
 //
 //  Other tasks
 //
-gulp.task("clean", function(clb) {
-  del([BUILD_DIR + "/**"], { force: true }, clb);
-});
+gulp.task("clean", shell.task(
+  "rm -rf ./build"
+));
 
 
 gulp.task("build", [
   "clone_assets"
-], function(clb) {
-  setTimeout(function() {
-    _is_building = false;
-  }, 1000);
-  clb();
-});
+]);
 
 
 gulp.task("watch", ["build"], function() {
@@ -371,9 +367,7 @@ gulp.task("watch", ["build"], function() {
     paths.templates_all,
     paths.assets_stylesheets_all,
     paths.assets_javascripts_all
-  ]), function(event) {
-    if (!_is_building) gulp.run("build");
-  });
+  ]), ["build"]);
 });
 
 

@@ -1,3 +1,8 @@
+import page from "page";
+import _ from "underscore";
+import {state} from "../lib/state";
+
+
 function setup_routes() {
   Object.keys(App.data._routing_table).forEach(function(k) {
     var table_item = App.data._routing_table[k];
@@ -6,7 +11,7 @@ function setup_routes() {
     page(
       "/" + route,
       function(route, next) {
-        App.state.route_page_path = table_item.page_path;
+        state.route_page_path = table_item.page_path;
         next();
       },
       all_routes
@@ -16,8 +21,8 @@ function setup_routes() {
 
 
 function all_routes(route) {
-  App.state.route = route.path.replace(/^\//, "");
-  App.state.route_params = _.extend({}, route.params);
+  state.route = route.path.replace(/^\//, "");
+  state.route_params = _.extend({}, route.params);
 }
 
 
@@ -26,7 +31,7 @@ function all_routes(route) {
 //  Base
 //
 function base() {
-  var initial = App.state.initial_route.split("/");
+  var initial = state.initial_route.split("/");
   var pathname = window.location.pathname.replace(/^\/+/, "").split("/");
 
   pathname.pop();

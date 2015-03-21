@@ -1,3 +1,8 @@
+import _ from "underscore";
+import helpers from "../lib/helpers";
+import {stateNotifier} from "../lib/state";
+
+
 skate("container", {
 
   created: function(el) {
@@ -13,16 +18,16 @@ skate("container", {
 
 
     bind_events() {
-      App.stateNotifier.on("change:route_page_path", this.render);
+      stateNotifier.on("change:route_page_path", this.render);
     },
 
     unbind_events() {
-      App.stateNotifier.off("change:route_page_path", this.render);
+      stateNotifier.off("change:route_page_path", this.render);
     },
 
     render(route_page_path) {
-      var page_data = App.helpers.traverse_object(route_page_path, App.data.pages);
-      var template = App.helpers.get_template("pages/" + route_page_path);
+      var page_data = helpers.traverse_object(route_page_path, App.data.pages);
+      var template = helpers.get_template("pages/" + route_page_path);
       var compiled_template = template(page_data);
 
       this.innerHTML = compiled_template;

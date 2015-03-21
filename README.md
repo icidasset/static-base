@@ -14,7 +14,7 @@ Scaffolding for static websites, focused on sites using the history api.
 
 ### Javascript
 
-- Browserify
+- [JSPM](http://jspm.io/)
 - ES6 compiled to ES5 using [babel.js](https://babeljs.io/)
 - Handlebars v3 `window.Handlebars`
 - Handlebars helpers are available via `window.HandlebarsHelpers`
@@ -26,25 +26,10 @@ Scaffolding for static websites, focused on sites using the history api.
 ## Development
 
 ```bash
-# build & watch
-gulp
-
-# production build (minified js & css)
-gulp build --production
-
-# static server
-# -> npm install -g node-static
-static build/
+npm install
+npm run gulp # build & watch
+npm run start # static server
 ```
-
-### Javascript
-
-The javascript is compiled through browserify + the babel.js plugin.
-But this sometimes generates conflicts with some vendor scripts, so
-I added a way to add vendor scripts that are not run through browserify.
-In the `config.yml` file there is an array `javascript.vendor_paths`,
-this is an array containing paths to various js files of which the path
-is relative to the root of the project.
 
 
 

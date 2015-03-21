@@ -1,6 +1,9 @@
+import {state} from "../lib/state";
+
+
 var locale = document.querySelector("html").getAttribute("language");
-var data_url = HandlebarsHelpers.relative_path("data/" + locale + ".json", App.state.initial_route);
-var use_data_from_html = false;
+var data_url = HandlebarsHelpers.relative_path("data/" + locale + ".json", state.initial_route);
+var use_data_from_html = true;
 var promise;
 
 
