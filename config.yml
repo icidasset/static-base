@@ -4,8 +4,5 @@ build_directory: "build"
 locales:
   default: "en"
 
-data:
-  in_html: true
-
 javascript:
   app_variable_name: "App"

@@ -31,7 +31,7 @@
     "directories": {
       "packages": "build/assets/jspm_packages"
     },
-    "configFile": "assets/javascripts/jspm-config.js",
+    "configFile": "jspm-config.js",
     "dependencies": {
       "es6-promise": "npm:es6-promise@^2.0.1",
       "fetch": "github:github/fetch@^0.7.0",

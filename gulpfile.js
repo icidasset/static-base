@@ -195,13 +195,18 @@ gulp.task("build_css", function() {
 //  Javascripts
 //
 gulp.task("build_js", function() {
-  var handlebars_stream = gulp.src([
+  var streams = [], s;
+
+  // handlebars
+  s = gulp.src([
     "node_modules/handlebars/dist/handlebars.js",
     "handlebars_helpers.js"
   ]).pipe(concat("handlebars.js"));
 
+  streams.push(s);
+
   // templates
-  var templates_stream = gulp.src(paths.templates_all)
+  s = gulp.src(paths.templates_all)
     .pipe(gulp_handlebars({ handlebars: handlebars }))
     .pipe(wrap("Handlebars.template(<%= contents %>)"))
     .pipe(declare({
@@ -211,11 +216,15 @@ gulp.task("build_js", function() {
     }))
     .pipe(concat("templates.js"));
 
+  streams.push(s);
+
   // jspm config
-  var jspm_config_stream = gulp.src("assets/javascripts/jspm-config.js");
+  s = gulp.src("./jspm-config.js");
+
+  streams.push(s);
 
   // build
-  return merge(handlebars_stream, templates_stream, jspm_config_stream)
+  return merge.apply(merge, streams)
     .pipe(gulp_if(argv.production, uglify()))
     .pipe(gulp.dest(BUILD_DIR + "/assets/javascripts"));
 });
@@ -247,10 +256,9 @@ function build_html_files(locale, default_locale) {
     helpers: handlebars_helpers
   };
 
-  var data_base_object = (CONFIG.data.in_html ?
-    { data_as_json: JSON.stringify(data_object[locale]) } :
-    {}
-  );
+  var data_base_object = {
+    data_as_json: JSON.stringify(data_object[locale])
+  };
 
   underscore.extend(data_base_object, {
     _all: data_object[locale]
@@ -352,4 +360,15 @@ gulp.task("build", [
 ]);
 
 
-gulp.task("default", ["build"]);
+gulp.task("watch", ["build"], function() {
+  gulp.watch(underscore.flatten([
+    paths.data,
+    paths.layouts,
+    paths.templates_all,
+    paths.assets_stylesheets_all,
+    paths.assets_javascripts_all
+  ]), ["build"]);
+});
+
+
+gulp.task("default", ["watch"]);
