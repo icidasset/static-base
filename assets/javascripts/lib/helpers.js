@@ -14,6 +14,20 @@ export default {
 
   get_template: function(path) {
     return this.traverse_object(path, App.templates);
+  },
+
+
+  get_parents: function(el) {
+    var parents = [];
+    var p = el.parentNode;
+
+    while (p !== null) {
+      var o = p;
+      parents.push(o);
+      p = o.parentNode;
+    }
+
+    return parents;
   }
 
 };

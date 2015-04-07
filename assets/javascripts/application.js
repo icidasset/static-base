@@ -4,11 +4,9 @@ import "object.observe";
 import "skatejs";
 
 import "./lib/environment";
-import "./lib/helpers";
-import "./lib/state";
 
-import "./components/header";
 import "./components/container";
+import "./components/header";
 
 import data_promise from "./lib/data";
 import setup_routes from "./lib/routes";

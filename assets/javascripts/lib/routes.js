@@ -1,6 +1,7 @@
 import page from "page";
 import _ from "underscore";
 import {state} from "../lib/state";
+import helpers from "./helpers";
 
 
 function setup_routes() {
@@ -23,7 +24,19 @@ function setup_routes() {
 function all_routes(route) {
   state.route = route.path.replace(/^\//, "");
   state.route_params = _.extend({}, route.params);
+  if (window._gaq) _gaq.push(['_trackPageview', route.path]);
 }
+
+
+
+//
+//  Config
+//
+page({
+  click: false,
+  popstate: true,
+  dispatch: true
+});
 
 
 
@@ -50,13 +63,28 @@ page.base(base());
 //  Intercept internal link clicks
 //
 document.addEventListener("click", function(event) {
-  if (event.target.tagName.toLowerCase() === "a") {
-    var href = event.target.getAttribute("href");
+  var TAGNAME = "a";
+  var href;
 
-    if (href && !href.match(/^\w+\:\/\//)) {
-      page.show("/" + relative_to_absolute(href));
-      event.preventDefault();
+  if (event.target.tagName.toLowerCase() === TAGNAME) {
+    href = event.target.getAttribute("href");
+
+  } else {
+    var parents = helpers.get_parents(event.target);
+    var parent_idx = _.findIndex(parents, function(p) {
+      return p.tagName ? p.tagName.toLowerCase() === TAGNAME : false;
+    });
+
+    if (parent_idx !== -1) {
+      href = parents[parent_idx].getAttribute("href");
     }
+
+  }
+
+  if (href && !href.match(/^\w+\:\/\//)) {
+    page.show("/" + relative_to_absolute(href));
+    event.preventDefault();
+    event.stopPropagation();
   }
 });
 

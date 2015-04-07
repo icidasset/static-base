@@ -1,3 +1,4 @@
-_nav_index: 0
+settings:
+  nav_index: 100
 
 title: "Index"
