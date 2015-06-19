@@ -1,42 +1,176 @@
 # Static Base
 
-Scaffolding for static websites, focused on sites using the history api.
+A optionated set of tools for building static websites.
+Uses handlebars, markdown and toml.
 
 
-## Features
+## How to use
 
-### General
+Example structure:
 
-- Data, in multiple languages, through yaml and markdown files
-- Templates, written in handlebars, compiled to html and javascript
-- Templates use layouts and partials
+```
+content/pages
+content/pages/[index].md
+content/pages/[index].toml
+content/pages/about.md
+content/pages/about.toml
+content/pages/blog.toml
+content/collections/blog/sample-post.md
+
+templates/pages/[index].hbs
+templates/pages/about.hbs
+templates/pages/blog.hbs
+templates/pages/blog/post.hbs
+templates/partials/navigation.hbs
+
+layouts/application.hbs
+
+assets/javascripts/application.js
+assets/stylesheets/application.scss
+assets/images/...
+```
+
+This structure uses the default directory names/paths
+and can be used in the following way:
+
+```js
+import * as static_base from "static-base";
 
 
-### Javascript
+// first argument, project root
+let instance = new static_base.Class(__dirname, {
+  content: {
+    collections: {
 
-- [JSPM](http://jspm.io/)
-- ES6 compiled to ES5 using [babel.js](https://babeljs.io/)
-- Handlebars v3 `window.Handlebars`
-- Handlebars helpers are available via `window.HandlebarsHelpers`
-- Handlebars templates are available via `window.app_variable_name.templates` (see config.yml)
-- Data is available as JSON in script tag or separate file
+      blog: function(file_path, item_path, tree) {
+        if (file_path.endsWith(".md")) {
+          let key = item_path.split("/")[0];
+          let parse_result = static_base.utils.parse_markdown_file(file_path);
+          if (parse_result.published) tree.handle_data(key, parse_result);
+        }
+      }
+
+    }
+  },
+
+  assets: {
+    static_directories: [
+      "images"
+    ]
+  }
+});
+
+// make a build
+instance.build();
+
+// make a partial build
+instance.build("html");
+```
+
+
+### Partial build arguments
+
+- `html`
+- `css` or `stylesheets`
+- `js` or `javascripts`
+- `static_assets`
 
 
 
-## Development
+## Example / Demo
 
-```bash
-npm install
-npm run gulp # build & watch
-npm run start # static server
+TODO
+
+
+
+## Collection with assets
+
+Example structure:
+
+```
+content/collections/portfolio/description.md
+content/collections/portfolio/settings.toml
+content/collections/portfolio/image.jpg
+```
+
+```js
+portfolio: function(file_path, item_path, tree) {
+  // the key represent the item's slug/name/path
+  let key = item_path.split("/")[0];
+
+  if (file_path.endsWith("settings.toml")) {
+    tree.handle_data(key, static_base.utils.parse_toml_file(file_path));
+  } else if (file_path.endsWith("description.md")) {
+    tree.handle_data(key, static_base.utils.parse_markdown_file(file_path));
+  } else if (file_path.match(/\.(png|jpg|jpeg|gif|svg|webp)$/i)) {
+    // if 2nd argument is given, it is stored in `portfolio_tree.item.assets`
+    // if no 2nd argument is given, it is stored in `portfolio_tree.assets`
+    tree.handle_asset(item_path, key);
+  }
+}
 ```
 
 
 
-## How it works
+## Customize directories
 
-### Routing
+Defaults:
 
-The tree structure of `data/:locale/pages` is converted into a routing table that will be used to build the html files and is also used to setup the routing in javascript. For example, `about/origin.yml` will have the route `about/origin/`. This can be overridden by adding a __route property__ in the yaml, the __fr__ locale serves as an example for this. A routing table is build for every locale and is stored in its data object as `_routing_table`. _Note that the file and directory names should be the same for every locale and should also match the tree structure for the templates_.
+```js
+new static_base.Class(__dirname, {
+  content: {
+    directory: "content",
+  },
+  assets: {
+    directory: "assets",
+    css_directory: "stylesheets",
+    js_directory: "javascripts",
+    static_directories: []
+  },
+  build: {
+    directory: "build"
+  }
+});
+```
 
-The base of the routes is calculated based on the __initial route__, which is passed to javascript by the `initial-state` JSON object. The JSON is located in the application layout.
+
+
+## Markdown and frontmatter
+
+The markdown is compiled through [markdown-it](https://github.com/markdown-it/markdown-it) and the frontmatter (toml format) through [gray-matter](https://github.com/jonschlinkert/gray-matter).
+
+Example:
+
+```markdown
+---
+key = "value"
+---
+
+# This title will be extracted and put into the __title property__
+
+Text
+```
+
+To install [markdown-it extensions](https://github.com/markdown-it/markdown-it#syntax-extensions):
+
+```js
+import MarkdownItMark from "markdown-it-mark";
+
+
+instance.markdown_parser.use(MarkdownItMark);
+```
+
+
+
+## Stylesheets
+
+The CSS is compiled with `node-sass` and `bourbon` can be imported.
+
+
+
+## Todo list
+
+- Make example
+- Write tests
+- Production build option (no sourcemaps, minified js & css)
+- More handlebars helpers (better ways to loop over collections & pages)
