@@ -1,5 +1,5 @@
 {
-  "name": "static-base-rewrite",
+  "name": "static-base",
   "version": "0.0.1",
   "description": "An opinionated set of tools to make static websites",
   "main": "lib/main.js",
