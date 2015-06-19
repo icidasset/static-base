@@ -42,10 +42,10 @@ let instance = new static_base.Class(__dirname, {
   content: {
     collections: {
 
-      blog: function(file_path, item_path, tree) {
+      blog: function(file_path, item_path, tree, utils) {
         if (file_path.endsWith(".md")) {
           let key = item_path.split("/")[0];
-          let parse_result = static_base.utils.parse_markdown_file(file_path);
+          let parse_result = utils.parse_markdown_file(file_path);
           if (parse_result.published) tree.handle_data(key, parse_result);
         }
       }
