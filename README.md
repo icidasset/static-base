@@ -154,6 +154,10 @@ Example:
 ---
 key: "value"
 ---
+
+# This title will be extracted and put into the __title property__
+
+Text
 ```
 
 The frontmatter uses the YAML format by default because it is better supported in markdown editors. But you can use the TOML format by setting the following option:
@@ -166,11 +170,6 @@ new StaticBase(__dirname, {
     }
   }
 })
-```
-
-# This title will be extracted and put into the __title property__
-
-Text
 ```
 
 To install [markdown-it extensions](https://github.com/markdown-it/markdown-it#syntax-extensions):
