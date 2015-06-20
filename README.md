@@ -38,7 +38,8 @@ import StaticBase from "static-base";
 import path from "path"; // node-js stdlib
 
 
-// first argument, project root
+// 1st argument, project root
+// 2nd argument, options
 let instance = new StaticBase(__dirname, {
   content: {
     collections: {
