@@ -154,6 +154,7 @@ Example:
 ---
 key: "value"
 ---
+```
 
 The frontmatter uses the YAML format by default because it is better supported in markdown editors. But you can use the TOML format by setting the following option:
 
