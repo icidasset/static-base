@@ -34,18 +34,19 @@ This structure uses the default directory names/paths
 and can be used in the following way:
 
 ```js
-import * as static_base from "static-base";
+import StaticBase from "static-base";
+import path from "path"; // node-js stdlib
 
 
 // first argument, project root
-let instance = new static_base.Class(__dirname, {
+let instance = new StaticBase(__dirname, {
   content: {
     collections: {
 
-      blog: function(file_path, item_path, tree, utils) {
+      blog: function(file_path, item_path, tree, parsers) {
         if (file_path.endsWith(".md")) {
-          let key = item_path.split("/")[0];
-          let parse_result = utils.parse_markdown_file(file_path);
+          let key = path.basename(item_path, ".md");
+          let parse_result = parsers.parse_markdown_file(file_path);
           if (parse_result.published) tree.handle_data(key, parse_result);
         }
       }
@@ -77,9 +78,15 @@ instance.build("html");
 
 
 
-## Example / Demo
+## JSPM setup
 
 TODO
+
+
+
+## Example / Demo
+
+For an example using all possible options, see the `test` directory.
 
 
 
@@ -88,20 +95,21 @@ TODO
 Example structure:
 
 ```
-content/collections/portfolio/description.md
-content/collections/portfolio/settings.toml
-content/collections/portfolio/image.jpg
+content/collections/portfolio/item-1/description.md
+content/collections/portfolio/item-1/settings.toml
+content/collections/portfolio/item-1/image.jpg
 ```
 
 ```js
-portfolio: function(file_path, item_path, tree) {
+portfolio: function(file_path, item_path, tree, parsers) {
   // the key represent the item's slug/name/path
+  // e.g. 'item-1'
   let key = item_path.split("/")[0];
 
   if (file_path.endsWith("settings.toml")) {
-    tree.handle_data(key, static_base.utils.parse_toml_file(file_path));
+    tree.handle_data(key, parsers.parse_toml_file(file_path));
   } else if (file_path.endsWith("description.md")) {
-    tree.handle_data(key, static_base.utils.parse_markdown_file(file_path));
+    tree.handle_data(key, parsers.parse_markdown_file(file_path));
   } else if (file_path.match(/\.(png|jpg|jpeg|gif|svg|webp)$/i)) {
     // if 2nd argument is given, it is stored in `portfolio_tree.item.assets`
     // if no 2nd argument is given, it is stored in `portfolio_tree.assets`
@@ -117,9 +125,9 @@ portfolio: function(file_path, item_path, tree) {
 Defaults:
 
 ```js
-new static_base.Class(__dirname, {
+new StaticBase(__dirname, {
   content: {
-    directory: "content",
+    directory: "content"
   },
   assets: {
     directory: "assets",
@@ -137,14 +145,26 @@ new static_base.Class(__dirname, {
 
 ## Markdown and frontmatter
 
-The markdown is compiled through [markdown-it](https://github.com/markdown-it/markdown-it) and the frontmatter (toml format) through [gray-matter](https://github.com/jonschlinkert/gray-matter).
+The markdown is compiled through [markdown-it](https://github.com/markdown-it/markdown-it) and the frontmatter (yaml format) through [gray-matter](https://github.com/jonschlinkert/gray-matter).
 
 Example:
 
 ```markdown
 ---
-key = "value"
+key: "value"
 ---
+
+The frontmatter uses the YAML format by default because it is better supported in markdown editors. But you can use the TOML format by setting the following option:
+
+```js
+new StaticBase(__dirname, {
+  content: {
+    frontmatter: {
+      use_toml_syntax: true
+    }
+  }
+})
+```
 
 # This title will be extracted and put into the __title property__
 
@@ -170,7 +190,12 @@ The CSS is compiled with `node-sass` and `bourbon` can be imported.
 
 ## Todo list
 
-- Make example
-- Write tests
+- Create a simple JSPM workflow
 - Production build option (no sourcemaps, minified js & css)
 - More handlebars helpers (better ways to loop over collections & pages)
+- Export json object
+- Export handlebars templates to javascript
+- Initial state and data object in html (optional)
+- Add support for multiple languages
+- Add support for multiple layouts (html frontmatter)
+- Add some basic client-side javascript stuff?

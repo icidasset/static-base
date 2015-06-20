@@ -1,13 +1,16 @@
-.PHONY: build
+.PHONY: build test
 
 # variables
 BIN=./node_modules/.bin
 
 # default
-all: build
+all: build test
 
 #
 # Tasks
 #
 build:
 	$(BIN)/babel lib_es6 --out-dir lib --modules common
+
+test:
+	(cd test; .$(BIN)/babel-node test.js)

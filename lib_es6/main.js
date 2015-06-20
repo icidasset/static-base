@@ -1,5 +1,3 @@
-import fse from "fs-extra";
-
 import { build as build_html } from "./build/html";
 import { build as build_javascripts } from "./build/javascripts";
 import { build as build_static_assets } from "./build/static_assets";
@@ -24,17 +22,18 @@ export default class {
       return console.error("StaticBase error: base_path was not given");
     }
 
-    this.options = Object.assign({ base_path: base_path }, options);
+    this.options = this.clean_options(base_path, options);
     this.markdown_parser = markdown;
-    this.is_ready = true;
 
     // paths & directories
     this.derive_paths_from_options();
-    this.ensure_paths();
 
     // trees
-    this.collections_tree = collections.make_tree(this);
-    [this.pages_tree, this.navigation_items] = pages.make_tree(this);
+    if (!options.skip_trees) {
+      this.collections_tree = collections.make_tree(this);
+      [this.pages_tree, this.navigation_items] = pages.make_tree(this);
+      this.is_ready = true;
+    }
   }
 
 
@@ -88,6 +87,24 @@ export default class {
   }
 
 
+  /// Options
+  ///
+  clean_options(base_path, options) {
+    let obj = Object.assign({ base_path: base_path }, options);
+
+    utils.obj_ensure(obj, "content.frontmatter");
+    utils.obj_ensure(obj, "assets");
+
+    if (obj.assets.jspm_config_path) {
+      obj.assets.jspm_config_path = utils.clean_path(obj.assets.jspm_config_path);
+    } else {
+      obj.assets.jspm_config_path = "jspm_config.js";
+    }
+
+    return obj;
+  }
+
+
   /// Paths & directories
   ///
   derive_paths_from_options() {
@@ -109,16 +126,10 @@ export default class {
     paths.assets_js       = `${paths.base}/${directories.assets}/${directories.assets_js}`;
     paths.assets_static   = directories.assets_static.map((p) => `${paths.assets}/${p}`);
     paths.build           = `${paths.base}/${directories.build}`;
+    paths.jspm_config     = `${paths.base}/${opts.assets.jspm_config_path}`;
 
     this.paths = paths;
     this.directories = directories;
-  }
-
-
-  ensure_paths() {
-    fse.ensureDirSync(this.paths.assets_css);
-    fse.ensureDirSync(this.paths.assets_js);
-    this.paths.assets_static.forEach((p) => fse.ensureDirSync(p));
   }
 
 }

@@ -1,3 +1,4 @@
+import colors from "colors";
 import fs from "fs";
 import matter from "gray-matter";
 import toml from "toml";
@@ -27,12 +28,13 @@ export function parse_toml_file(file_path: string) {
 
 /// Parse Markdown file
 ///
-export function parse_markdown_file(file_path: string) {
+export function parse_markdown_file(file_path: string, front_matter_use_toml=false) {
   let file_contents_as_string = fs.readFileSync(file_path, { encoding: DEFAULT_ENCODING });
+  let front_matter_parser = front_matter_use_toml ? toml.parse : false;
   let front_matter, parsed_markdown, result;
 
   try {
-    front_matter = matter(file_contents_as_string, { parser: toml.parse });
+    front_matter = matter(file_contents_as_string, { parser: front_matter_parser });
     parsed_markdown = markdown.render(front_matter.content);
   } catch (e) {
     console.error(`Markdown parsing error in '${file_path}': ${e.message}.`);
@@ -83,7 +85,7 @@ export function route_to_path(route: string) {
 /// Clean path
 ///
 export function clean_path(path: string) {
-  return path.replace(/(^\/+|\/+$)/, "");
+  return path.replace(/(^\.*\/+|\/+$)/, "");
 }
 
 
@@ -95,8 +97,31 @@ export function obj_get(obj, path) {
 }
 
 
+export function obj_set(obj, path, value) {
+  return traverse(obj).set(path.split("."), value);
+}
+
+
+export function obj_ensure(obj, path) {
+  if (!obj_get(obj, path)) obj_set(obj, path, {});
+}
+
+
 export function obj_traverse(obj, callback, level=1) {
   traverse(obj).forEach(function(x) {
     if (this.level === level) callback(x, this.key);
   });
+}
+
+
+/// {Files}
+/// Check if file exists, if not give a warning
+///
+export function file_exists(path: string) {
+  if (fs.existsSync(path)) {
+    return true;
+  } else {
+    console.log(colors.yellow(`WARNING: '${path}' was not found`));
+    return false;
+  }
 }

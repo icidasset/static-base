@@ -15,11 +15,14 @@ function handle_file(page_path: string) {
   if (page_path.endsWith(".toml")) {
     obj = utils.parse_toml_file(page_path);
   } else if (page_path.endsWith(".md")) {
-    obj = utils.parse_markdown_file(page_path);
+    obj = utils.parse_markdown_file(
+      page_path,
+      !!this.static_base_options.content.frontmatter.use_toml_syntax
+    );
   }
 
   if (obj) {
-    this.handle_item(obj, page_path);
+    this.tree.handle_item(obj, page_path);
   }
 }
 
@@ -29,7 +32,10 @@ export function make_tree(static_base) {
   let tree = new PagesTree(pages_path, static_base.collections_tree);
 
   walk.sync(pages_path)
-      .forEach(handle_file.bind(tree));
+      .forEach(handle_file.bind({
+        static_base_options: static_base.options,
+        tree: tree
+      }));
 
   return [
     tree.get_object(),

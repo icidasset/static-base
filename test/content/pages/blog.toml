@@ -1,0 +1,13 @@
+title = "Writings"
+
+
+[settings]
+
+route = "writings"
+nav_index = 2
+
+
+[settings.collection]
+
+name = "blog"
+template = "blog/post"
