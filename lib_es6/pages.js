@@ -16,8 +16,9 @@ function handle_file(page_path: string) {
     obj = utils.parse_toml_file(page_path);
   } else if (page_path.endsWith(".md")) {
     obj = utils.parse_markdown_file(
+      this.static_base.markdown_parser,
       page_path,
-      !!this.static_base_options.content.frontmatter.use_toml_syntax
+      !!this.static_base.options.content.frontmatter.use_toml_syntax
     );
   }
 
@@ -33,7 +34,7 @@ export function make_tree(static_base) {
 
   walk.sync(pages_path)
       .forEach(handle_file.bind({
-        static_base_options: static_base.options,
+        static_base: static_base,
         tree: tree
       }));
 

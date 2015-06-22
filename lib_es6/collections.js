@@ -15,6 +15,7 @@ export function make_tree(static_base) {
     parse_toml_file: utils.parse_toml_file,
     parse_markdown_file: function(file_path) {
       return utils.parse_markdown_file(
+        static_base.markdown_parser,
         file_path,
         !!static_base.options.content.frontmatter.use_toml_syntax
       );

@@ -4,8 +4,6 @@ import matter from "gray-matter";
 import toml from "toml";
 import traverse from "traverse";
 
-import { parser as markdown } from "./markdown";
-
 
 export const DEFAULT_ENCODING = "utf-8";
 
@@ -28,14 +26,14 @@ export function parse_toml_file(file_path: string) {
 
 /// Parse Markdown file
 ///
-export function parse_markdown_file(file_path: string, front_matter_use_toml=false) {
+export function parse_markdown_file(parser, file_path: string, front_matter_use_toml=false) {
   let file_contents_as_string = fs.readFileSync(file_path, { encoding: DEFAULT_ENCODING });
   let front_matter_parser = front_matter_use_toml ? toml.parse : false;
   let front_matter, parsed_markdown, result;
 
   try {
     front_matter = matter(file_contents_as_string, { parser: front_matter_parser });
-    parsed_markdown = markdown.render(front_matter.content);
+    parsed_markdown = parser.render(front_matter.content);
   } catch (e) {
     console.error(`Markdown parsing error in '${file_path}': ${e.message}.`);
   }
