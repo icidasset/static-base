@@ -73,7 +73,7 @@ instance.build("html");
 
 // cli commands
 // 1. clean - remove everything in the build directory, except the jspm_packages directory
-instance.clean()
+instance.clean();
 
 // 2. watch - for changes
 instance.watch();
