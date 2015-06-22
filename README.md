@@ -75,9 +75,9 @@ instance.build("html");
 
 ### JSPM
 
-The build method also sets up JSPM if it needs to. That is, it checks if there's a jspm property defined in package.json, if there's not, it adds the paths defined in the options object that is passed to the StaticBase constructor.
+The build method also sets up JSPM if it needs to. That is, it checks if there's a JSPM property defined in package.json, if there's not, it adds the paths defined in the options object that is passed to the StaticBase constructor.
 
-How to override the default paths:
+To override the default paths:
 
 ```js
 new StaticBase(__dirname, {
@@ -134,32 +134,6 @@ portfolio: function(file_path, item_path, tree, parsers) {
 
 
 
-## Customize directories
-
-Defaults:
-
-```js
-new StaticBase(__dirname, {
-  content: {
-    directory: "content"
-  },
-  assets: {
-    directory: "assets",
-    css_directory: "stylesheets",
-    js_directory: "javascripts",
-    static_directories: [],
-
-    jspm_config_path: "jspm-config.js",
-    jspm_packages_path: "lib/jspm_packages",
-  },
-  build: {
-    directory: "build"
-  }
-});
-```
-
-
-
 ## Markdown and frontmatter
 
 The markdown is compiled through [markdown-it](https://github.com/markdown-it/markdown-it) and the frontmatter (yaml format) through [gray-matter](https://github.com/jonschlinkert/gray-matter).
@@ -205,10 +179,36 @@ The CSS is compiled with `node-sass` and `bourbon` can be imported.
 
 
 
+## Customize directories
+
+Defaults:
+
+```js
+new StaticBase(__dirname, {
+  content: {
+    directory: "content"
+  },
+  assets: {
+    directory: "assets",
+    css_directory: "stylesheets",
+    js_directory: "javascripts",
+    static_directories: [],
+
+    jspm_config_path: "jspm-config.js",
+    jspm_packages_path: "lib/jspm_packages",
+  },
+  build: {
+    directory: "build"
+  }
+});
+```
+
+
+
 ## Todo list
 
-- Create a simple JSPM workflow
-- Production build option (no sourcemaps, minified js & css)
+- Write more extensive tests
+- Production build option (enable/disable sourcemaps, minified js & css)
 - More handlebars helpers (better ways to loop over collections & pages)
 - Export json object
 - Export handlebars templates to javascript
