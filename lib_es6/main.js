@@ -1,3 +1,5 @@
+import path from "path";
+
 import { build as build_html } from "./build/html";
 import { build as build_javascripts } from "./build/javascripts";
 import { build as build_static_assets } from "./build/static_assets";
@@ -40,6 +42,8 @@ export default class {
   /// Build
   ///
   build(partial=false) {
+    let promises = [];
+
     if (!this.is_ready) {
       return false;
     }
@@ -47,44 +51,38 @@ export default class {
     switch (partial) {
 
       case "html":
-        build_html(this);
+        promises.push( build_html(this) );
         break;
 
       case "css":
       case "stylesheets":
-        build_stylesheets(this);
+        promises.push( build_stylesheets(this) );
         break;
 
       case "js":
       case "javascripts":
-        build_javascripts(this);
+        promises.push( build_javascripts(this) );
         break;
 
       case "static_assets":
-        build_static_assets(this);
+        promises.push( build_static_assets(this) );
         break;
 
       default:
-        build_html(this);
-        build_stylesheets(this);
-        build_javascripts(this);
-        build_static_assets(this);
+        promises.push( build_html(this) );
+        promises.push( build_stylesheets(this) );
+        promises.push( build_javascripts(this) );
+        promises.push( build_static_assets(this) );
     }
+
+    return Promise.all(promises);
   }
 
 
-  /// Clean
+  /// CLI commands
   ///
-  clean() {
-    if (this.is_ready) clean(this);
-  }
-
-
-  /// Watch
-  ///
-  watch() {
-    if (this.is_ready) watch(this);
-  }
+  clean() { if (this.is_ready) { clean(this); }}
+  watch() { if (this.is_ready) { watch(this); }}
 
 
   /// Options
@@ -95,10 +93,22 @@ export default class {
     utils.obj_ensure(obj, "content.frontmatter");
     utils.obj_ensure(obj, "assets");
 
+    // jspm paths
     if (obj.assets.jspm_config_path) {
       obj.assets.jspm_config_path = utils.clean_path(obj.assets.jspm_config_path);
     } else {
-      obj.assets.jspm_config_path = "jspm_config.js";
+      obj.assets.jspm_config_path = "lib/jspm_config.js";
+    }
+
+    if (obj.assets.jspm_packages_path) {
+      obj.assets.jspm_packages_path = utils.clean_path(obj.assets.jspm_packages_path);
+    } else {
+      obj.assets.jspm_packages_path = "build/assets/jspm_packages";
+    }
+
+    // node_modules path
+    if (!obj.node_modules_path) {
+      obj.node_modules_path = "node_modules";
     }
 
     return obj;
@@ -126,7 +136,15 @@ export default class {
     paths.assets_js       = `${paths.base}/${directories.assets}/${directories.assets_js}`;
     paths.assets_static   = directories.assets_static.map((p) => `${paths.assets}/${p}`);
     paths.build           = `${paths.base}/${directories.build}`;
+
     paths.jspm_config     = `${paths.base}/${opts.assets.jspm_config_path}`;
+    paths.jspm_packages   = `${paths.base}/${opts.assets.jspm_packages_path}`;
+    paths.node_modules    = `${paths.base}/${opts.node_modules_path}`;
+
+    utils.obj_traverse(paths, function(v, k) {
+      if (typeof v === "string") paths[k] = path.normalize(v);
+      else if (typeof v === "object") paths[k] = v.map((p) => path.normalize(p));
+    });
 
     this.paths = paths;
     this.directories = directories;

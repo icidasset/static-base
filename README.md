@@ -1,7 +1,8 @@
 # Static Base
 
-A optionated set of tools for building static websites.
+A optionated set of tools for building static websites.  
 Uses handlebars, markdown and toml.
+
 
 
 ## How to use
@@ -15,7 +16,8 @@ content/pages/[index].toml
 content/pages/about.md
 content/pages/about.toml
 content/pages/blog.toml
-content/collections/blog/sample-post.md
+content/collections/blog/sample-post-1.md
+content/collections/blog/sample-post-2.md
 
 templates/pages/[index].hbs
 templates/pages/about.hbs
@@ -44,6 +46,7 @@ let instance = new StaticBase(__dirname, {
   content: {
     collections: {
 
+      // parse files from the `content/collections/blog` directory
       blog: function(file_path, item_path, tree, parsers) {
         if (file_path.endsWith(".md")) {
           let key = path.basename(item_path, ".md");
@@ -70,6 +73,22 @@ instance.build("html");
 ```
 
 
+### JSPM
+
+The build method also sets up JSPM if it needs to. That is, it checks if there's a jspm property defined in package.json, if there's not, it adds the paths defined in the options object that is passed to the StaticBase constructor.
+
+How to override the default paths:
+
+```js
+new StaticBase(__dirname, {
+  assets: {
+    jspm_config_path: "lib/jspm_config.js",
+    jspm_packages_path: "build/assets/jspm_packages"
+  }
+});
+```
+
+
 ### Partial build arguments
 
 - `html`
@@ -79,19 +98,13 @@ instance.build("html");
 
 
 
-## JSPM setup
-
-TODO
-
-
-
 ## Example / Demo
 
 For an example using all possible options, see the `test` directory.
 
 
 
-## Collection with assets
+## Collections with assets
 
 Example structure:
 
@@ -134,7 +147,10 @@ new StaticBase(__dirname, {
     directory: "assets",
     css_directory: "stylesheets",
     js_directory: "javascripts",
-    static_directories: []
+    static_directories: [],
+
+    jspm_config_path: "jspm-config.js",
+    jspm_packages_path: "lib/jspm_packages",
   },
   build: {
     directory: "build"

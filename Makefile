@@ -13,4 +13,4 @@ build:
 	$(BIN)/babel lib_es6 --out-dir lib --modules common
 
 test:
-	(cd test; .$(BIN)/babel-node test.js)
+	npm test

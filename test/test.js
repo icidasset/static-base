@@ -10,7 +10,7 @@ const DEFAULT_ENCODING = "utf-8";
 
 /// Test custom paths
 ///
-(function() {
+describe("Custom paths", function() {
 
 
   let base = __dirname;
@@ -37,36 +37,32 @@ const DEFAULT_ENCODING = "utf-8";
 
   let i = new StaticBase(base, o);
 
-  assert.equal(i.paths.base, base);
-  assert.equal(i.paths.content, `${base}/${o.content.directory}`);
-  assert.equal(i.paths.assets, `${base}/${o.assets.directory}`);
-  assert.equal(i.paths.assets_css, `${base}/${o.assets.directory}/${o.assets.css_directory}`);
-  assert.equal(i.paths.assets_js, `${base}/${o.assets.directory}/${o.assets.js_directory}`);
-  assert.equal(i.paths.build, `${base}/${o.build.directory}`);
+  it("should build the correct paths", function() {
+    assert.equal(i.paths.base, base);
+    assert.equal(i.paths.content, `${base}/${o.content.directory}`);
+    assert.equal(i.paths.assets, `${base}/${o.assets.directory}`);
+    assert.equal(i.paths.assets_css, `${base}/${o.assets.directory}/${o.assets.css_directory}`);
+    assert.equal(i.paths.assets_js, `${base}/${o.assets.directory}/${o.assets.js_directory}`);
+    assert.equal(i.paths.build, `${base}/${o.build.directory}`);
 
-  assert.deepEqual(i.paths.assets_static, o.assets.static_directories.map(function(s) {
-    return `${base}/${o.assets.directory}/${s}`;
-  }));
-
-
-})();
-
+    assert.deepEqual(i.paths.assets_static, o.assets.static_directories.map(function(s) {
+      return `${base}/${o.assets.directory}/${s}`;
+    }));
+  });
 
 
-/*
-
-Test output
-
-? build/index.html
-? build/index.html contains '<title>Index — Static Base Test</title>'
-
-*/
-(function() {
+});
 
 
-  let base = __dirname;
 
-  let inst = new StaticBase(base, {
+/// Assert output
+///
+describe("Output", function() {
+
+
+  let inst = new StaticBase(__dirname, {
+    node_modules_path: "../node_modules",
+
     content: {
       collections: {
 
@@ -89,34 +85,47 @@ Test output
   let paths = inst.paths;
   let dirs = inst.directories;
 
-  // make a build
   inst.clean();
-  inst.build();
 
-  // test - if the correct html files were build
-  assert( fs.existsSync(`${paths.build}/index.html`) );
-  assert( fs.existsSync(`${paths.build}/writings/index.html`) );
-  assert( fs.existsSync(`${paths.build}/writings/sample-post-1/index.html`) );
+  let build_promise = inst.build();
 
-  // test - if the layout was applied
   let index_file = fs.readFileSync(
     `${paths.build}/index.html`,
     { encoding: DEFAULT_ENCODING }
   );
 
-  assert.notEqual( index_file.indexOf("<title>Index &mdash; Static Base Test</title>"), -1 );
-  assert.notEqual( index_file.indexOf("<body"), -1 );
+  it("should build the correct html files and paths", function() {
+    assert( fs.existsSync(`${paths.build}/index.html`) );
+    assert( fs.existsSync(`${paths.build}/writings/index.html`) );
+    assert( fs.existsSync(`${paths.build}/writings/sample-post-1/index.html`) );
+  });
 
-  // test - if the [index] template was rendered
-  assert.notEqual( index_file.indexOf("<h1>Index</h1>"), -1 );
+  it("should apply the layout", function() {
+    assert.notEqual( index_file.indexOf("<title>Index &mdash; Static Base Test</title>"), -1 );
+    assert.notEqual( index_file.indexOf("<body"), -1 );
+  });
 
-  // test - assets
-  // assert( fs.existsSync(`${paths.build}/${dirs.assets}/${dirs.assets_js}/application.js`) );
-  assert( fs.existsSync(`${paths.build}/${dirs.assets}/${dirs.assets_css}/application.css`) );
-  assert( fs.existsSync(`${paths.build}/${dirs.assets}/images/sample-image.jpg`) );
+  it("should render the template", function() {
+    assert.notEqual( index_file.indexOf("<h1>Index</h1>"), -1 );
+  });
 
-  // test - collection assets
-  // TODO
+  it("should build css", function() {
+    assert( fs.existsSync(`${paths.build}/${dirs.assets}/${dirs.assets_css}/application.css`) );
+  });
+
+  it("should copy the static assets", function() {
+    assert( fs.existsSync(`${paths.build}/${dirs.assets}/images/sample-image.jpg`) );
+  });
+
+  it("should build js and the jspm files", function() {
+    // TODO
+    return build_promise.then(function() {
+      assert( fs.existsSync(`${paths.build}/${dirs.assets}/${dirs.assets_js}/application.js`) );
+      assert( fs.existsSync(`package.json`) );
+      assert( fs.existsSync(`${inst.options.jspm_config_path}`) );
+      assert( fs.existsSync(`${inst.options.jspm_packages_path}`) );
+    });
+  });
 
 
-})();
+});
