@@ -7,7 +7,8 @@
     "static"
   ],
   "author": "icid.asset@gmail.com",
-  "license": "ISC",
+  "license": "MIT",
+  "repository": "icidasset/static-base",
   "dependencies": {
     "chokidar": "^1.0.3",
     "colors": "^1.1.2",
