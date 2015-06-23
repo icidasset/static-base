@@ -1,4 +1,4 @@
-import assert from "assert";
+import { assert } from "chai";
 import fs from "fs";
 import path from "path";
 
@@ -27,11 +27,7 @@ describe("Custom paths", function() {
     },
     build: {
       directory: "output"
-    },
-
-    // don't make trees,
-    // because these directories don't actually exist
-    skip_trees: true
+    }
   };
 
 
@@ -88,44 +84,65 @@ describe("Output", function() {
   inst.clean();
 
   let build_promise = inst.build();
-
   let index_file = fs.readFileSync(
     `${paths.build}/index.html`,
     { encoding: DEFAULT_ENCODING }
   );
 
   it("should build the correct html files and paths", function() {
-    assert( fs.existsSync(`${paths.build}/index.html`) );
-    assert( fs.existsSync(`${paths.build}/writings/index.html`) );
-    assert( fs.existsSync(`${paths.build}/writings/sample-post-1/index.html`) );
+    return build_promise.then(function() {
+      assert_exist(`${paths.build}/index.html`);
+      assert_exist(`${paths.build}/writings/index.html`);
+      assert_exist(`${paths.build}/writings/sample-post-1/index.html`);
+    });
   });
 
   it("should apply the layout", function() {
-    assert.notEqual( index_file.indexOf("<title>Index &mdash; Static Base Test</title>"), -1 );
-    assert.notEqual( index_file.indexOf("<body"), -1 );
+    return build_promise.then(function() {
+      assert.notEqual( index_file.indexOf("<title>Index &mdash; Static Base Test</title>"), -1 );
+      assert.notEqual( index_file.indexOf("<body"), -1 );
+    });
   });
 
   it("should render the template", function() {
-    assert.notEqual( index_file.indexOf("<h1>Index</h1>"), -1 );
+    return build_promise.then(function() {
+      assert.notEqual( index_file.indexOf("<h1>Index</h1>"), -1 );
+    });
   });
 
   it("should build css", function() {
-    assert( fs.existsSync(`${paths.build}/${dirs.assets}/${dirs.assets_css}/application.css`) );
+    return build_promise.then(function() {
+      assert_exist(`${paths.build}/${dirs.assets}/${dirs.assets_css}/application.css`);
+    });
   });
 
   it("should copy the static assets", function() {
-    assert( fs.existsSync(`${paths.build}/${dirs.assets}/images/sample-image.jpg`) );
+    return build_promise.then(function() {
+      assert_exist(`${paths.build}/${dirs.assets}/images/sample-image.jpg`);
+    });
   });
 
   it("should build js and the jspm files", function() {
-    // TODO
     return build_promise.then(function() {
-      assert( fs.existsSync(`${paths.build}/${dirs.assets}/${dirs.assets_js}/application.js`) );
-      assert( fs.existsSync(`package.json`) );
-      assert( fs.existsSync(`${inst.options.jspm_config_path}`) );
-      assert( fs.existsSync(`${inst.options.jspm_packages_path}`) );
+      assert_exist(`${paths.build}/${dirs.assets}/${dirs.assets_js}/application.js`);
+      assert_exist(`${paths.base}/package.json`);
+      assert_exist(`${paths.base}/${inst.options.assets.jspm_config_path}`);
+      assert_exist(`${paths.base}/${inst.options.assets.jspm_packages_path}`);
     });
   });
 
 
 });
+
+
+
+/// [Helpers]
+///
+function assert_exist(_path) {
+  assert.doesNotThrow(
+    function() {
+      return fs.accessSync(_path);
+    },
+    Error
+  );
+}

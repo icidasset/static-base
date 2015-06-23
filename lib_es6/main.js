@@ -30,12 +30,8 @@ export default class {
     // paths & directories
     this.derive_paths_from_options();
 
-    // trees
-    if (!options.skip_trees) {
-      this.collections_tree = collections.make_tree(this);
-      [this.pages_tree, this.navigation_items] = pages.make_tree(this);
-      this.is_ready = true;
-    }
+    // ready
+    this.is_ready = true;
   }
 
 
@@ -46,6 +42,9 @@ export default class {
 
     if (!this.is_ready) {
       return false;
+    } else if (!this.pages_tree) {
+      this.collections_tree = collections.make_tree(this);
+      [this.pages_tree, this.navigation_items] = pages.make_tree(this);
     }
 
     switch (partial) {

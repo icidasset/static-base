@@ -116,9 +116,10 @@ export function obj_traverse(obj, callback, level=1) {
 /// Check if file exists, if not give a warning
 ///
 export function file_exists(path: string) {
-  if (fs.existsSync(path)) {
+  try {
+    fs.accessSync(path);
     return true;
-  } else {
+  } catch (e) {
     console.log(colors.yellow(`WARNING: '${path}' was not found`));
     return false;
   }
