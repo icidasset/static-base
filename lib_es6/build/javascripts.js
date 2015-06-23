@@ -59,7 +59,7 @@ function copy_jspm_config(paths, dirs) {
 }
 
 
-function run_jspm(paths, dirs) {
+function run_jspm(paths, dirs, minify) {
   jspm.setPackagePath(paths.base);
 
   // install, build jspm & return promise
@@ -72,7 +72,7 @@ function run_jspm(paths, dirs) {
     return jspm.bundleSFX(
       `${paths.assets_js}/application.js`,
       `${paths.build}/${dirs.assets}/${dirs.assets_js}/application.js`,
-      { mangle: false, sourceMaps: false }
+      { sourceMaps: !minify, minify: minify }
     );
 
   }).then(function() {
@@ -84,11 +84,11 @@ function run_jspm(paths, dirs) {
 
 /// <Build>
 ///
-export function build(static_base) {
+export function build(static_base, minify=false) {
   console.log("> Build javascripts");
 
   if (utils.file_exists(`${static_base.paths.assets_js}/application.js`)) {
     add_jspm_to_package_json(static_base.paths, static_base.directories, static_base.options);
-    return run_jspm(static_base.paths, static_base.directories);
+    return run_jspm(static_base.paths, static_base.directories, minify);
   }
 }

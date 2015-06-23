@@ -75,6 +75,9 @@ instance.build().then(function() {
 // make a partial build
 instance.build("html");
 
+// make a production build (minified and no sourcemaps)
+instance.build("all", true);
+
 // cli commands
 // 1. clean - remove everything in the build directory, except the jspm_packages directory
 instance.clean();
@@ -219,7 +222,6 @@ new StaticBase(__dirname, {
 
 ## Todo list
 
-- Production build option (enable/disable sourcemaps, minified js & css)
 - More handlebars helpers (better ways to loop over collections & pages)
 - Export handlebars templates to javascript
 - Initial state and data object in html (optional)

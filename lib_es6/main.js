@@ -38,7 +38,7 @@ export default class {
 
   /// Build
   ///
-  build(partial=false) {
+  build(partial=false, minify=false) {
     let promises = [];
 
     if (!this.is_ready) {
@@ -51,17 +51,17 @@ export default class {
     switch (partial) {
 
       case "html":
-        promises.push( build_html(this) );
+        promises.push( build_html(this, minify) );
         break;
 
       case "css":
       case "stylesheets":
-        promises.push( build_stylesheets(this) );
+        promises.push( build_stylesheets(this, minify) );
         break;
 
       case "js":
       case "javascripts":
-        promises.push( build_javascripts(this) );
+        promises.push( build_javascripts(this, minify) );
         break;
 
       case "static_assets":
@@ -73,9 +73,9 @@ export default class {
         break;
 
       default:
-        promises.push( build_html(this) );
-        promises.push( build_stylesheets(this) );
-        promises.push( build_javascripts(this) );
+        promises.push( build_html(this, minify) );
+        promises.push( build_stylesheets(this, minify) );
+        promises.push( build_javascripts(this, minify) );
         promises.push( build_static_assets(this) );
         promises.push( build_json(this) );
     }

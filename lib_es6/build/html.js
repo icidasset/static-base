@@ -12,6 +12,7 @@ import fse from "fs-extra";
 import handlebars from "handlebars";
 import path from "path";
 import walk from "walkdir";
+import { minify as minify_html } from "html-minifier";
 
 import * as handlebars_helpers from "../handlebars/helpers";
 import * as utils from "../utils";
@@ -64,7 +65,7 @@ function register_handlebars_helpers(isolated_handlebars) {
 
 /// <Build>
 ///
-export function build(static_base) {
+export function build(static_base, minify=false) {
   console.log("> Build html");
 
   let isolated_handlebars = handlebars.create();
@@ -88,6 +89,14 @@ export function build(static_base) {
     let html = templates.layouts.application(
       Object.assign({ yield: page_template(page_template_data) }, page_template_data)
     );
+
+    html = minify_html(html, {
+      collapseWhitespace: true,
+      removeComments: true,
+      removeCommentsFromCDATA: true,
+      minifyJS: true,
+      minifyCSS: true
+    });
 
     // make html file
     fse.mkdirsSync(`${static_base.paths.build}/${html_path_dir}`);

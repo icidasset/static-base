@@ -90,7 +90,7 @@ describe("Output", function() {
 
   inst.clean();
 
-  let build_promise = inst.build();
+  let build_promise = inst.build("all");
   let index_file = fs.readFileSync(
     `${paths.build}/index.html`,
     { encoding: DEFAULT_ENCODING }

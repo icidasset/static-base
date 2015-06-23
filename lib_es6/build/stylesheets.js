@@ -8,7 +8,7 @@ import * as utils from "../utils";
 
 /// application.css
 ///
-function build_application_css(paths, dirs) {
+function build_application_css(paths, dirs, minify) {
   return new Promise(function(resolve, reject) {
 
     let result;
@@ -17,7 +17,7 @@ function build_application_css(paths, dirs) {
       result = sass.renderSync({
         file: `${paths.assets_css}/application.scss`,
         includePaths: [].concat(bourbon.includePaths),
-        outputStyle: "compressed"
+        outputStyle: minify ? "compressed" : "nested"
       });
     } catch (err) {
       reject(`(${dirs.assets_css}) ${err}`);
@@ -36,10 +36,10 @@ function build_application_css(paths, dirs) {
 
 /// <Build>
 ///
-export function build(static_base) {
+export function build(static_base, minify=false) {
   console.log("> Build stylesheets");
 
   if (utils.file_exists(`${static_base.paths.assets_css}/application.scss`)) {
-    return build_application_css(static_base.paths, static_base.directories);
+    return build_application_css(static_base.paths, static_base.directories, minify);
   }
 }
