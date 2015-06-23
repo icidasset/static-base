@@ -9,14 +9,28 @@ import * as utils from "../utils";
 /// application.css
 ///
 function build_application_css(paths, dirs) {
-  let result = sass.renderSync({
-    file: `${paths.assets_css}/application.scss`,
-    includePaths: [].concat(bourbon.includePaths),
-    outputStyle: "compressed"
-  });
+  return new Promise(function(resolve, reject) {
 
-  fse.mkdirsSync(`${paths.build}/${dirs.assets}/${dirs.assets_css}`);
-  fs.writeFileSync(`${paths.build}/${dirs.assets}/${dirs.assets_css}/application.css`, result.css);
+    let result;
+
+    try {
+      result = sass.renderSync({
+        file: `${paths.assets_css}/application.scss`,
+        includePaths: [].concat(bourbon.includePaths),
+        outputStyle: "compressed"
+      });
+    } catch (err) {
+      reject(`(${dirs.assets_css}) ${err}`);
+    }
+
+    let css = result.css;
+
+    fse.mkdirsSync(`${paths.build}/${dirs.assets}/${dirs.assets_css}`);
+    fs.writeFileSync(`${paths.build}/${dirs.assets}/${dirs.assets_css}/application.css`, css);
+
+    resolve();
+
+  });
 }
 
 
@@ -26,6 +40,6 @@ export function build(static_base) {
   console.log("> Build stylesheets");
 
   if (utils.file_exists(`${static_base.paths.assets_css}/application.scss`)) {
-    build_application_css(static_base.paths, static_base.directories);
+    return build_application_css(static_base.paths, static_base.directories);
   }
 }
