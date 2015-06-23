@@ -66,7 +66,11 @@ let instance = new StaticBase(__dirname, {
 });
 
 // make a build
-instance.build();
+instance.build().then(function() {
+  console.log("Build success");
+}, function(err) {
+  console.log("Build error:", err);
+});
 
 // make a partial build
 instance.build("html");

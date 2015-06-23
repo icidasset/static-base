@@ -28,13 +28,23 @@ function add_jspm_to_package_json(paths, dirs, opts) {
   if (!obj.jspm) {
     obj.jspm = {
       directories: { packages: opts.assets.jspm_packages_path },
-      configFile: opts.assets.jspm_config_path
+      configFile: opts.assets.jspm_config_path,
+      devDependencies: {}
     };
 
     fs.writeFileSync(
       package_json_path,
       json_beautify(obj, null, 2, 8)
     );
+
+  } else if (!obj.jspm.devDependencies) {
+    obj.jspm.devDependencies = {};
+
+    fs.writeFileSync(
+      package_json_path,
+      json_beautify(obj, null, 2, 8)
+    );
+
   }
 }
 
@@ -53,7 +63,7 @@ function run_jspm(paths, dirs) {
   jspm.setPackagePath(paths.base);
 
   // install, build jspm & return promise
-  return jspm.dlLoader().then(function() {
+  return jspm.dlLoader("babel").then(function() {
     return jspm.install(true, { quick: true });
 
   }).then(function() {
