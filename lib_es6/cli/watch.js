@@ -28,6 +28,7 @@ function watch_handler(event, path) {
 
   } else if (path.match(/^content\//)) {
     this.build("html");
+    this.build("json");
     this.build("static_assets");
 
   } else if (path.match(/^assets\//)) {

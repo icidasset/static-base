@@ -2,6 +2,7 @@ import path from "path";
 
 import { build as build_html } from "./build/html";
 import { build as build_javascripts } from "./build/javascripts";
+import { build as build_json } from "./build/json";
 import { build as build_static_assets } from "./build/static_assets";
 import { build as build_stylesheets } from "./build/stylesheets";
 import { parser as markdown } from "./markdown";
@@ -67,11 +68,16 @@ export default class {
         promises.push( build_static_assets(this) );
         break;
 
+      case "json":
+        promises.push( build_json(this) );
+        break;
+
       default:
         promises.push( build_html(this) );
         promises.push( build_stylesheets(this) );
         promises.push( build_javascripts(this) );
         promises.push( build_static_assets(this) );
+        promises.push( build_json(this) );
     }
 
     return Promise.all(promises);
@@ -127,6 +133,7 @@ export default class {
     directories.assets_js     = utils.obj_get(opts, "assets.js_directory") || "javascripts";
     directories.assets_static = utils.obj_get(opts, "assets.static_directories") || [];
     directories.build         = utils.obj_get(opts, "build.directory") || "build";
+    directories.build_json    = utils.obj_get(opts, "build.json_directory") || "data";
 
     paths.base            = opts.base_path.replace(/\/+$/, "");
     paths.content         = `${paths.base}/${directories.content}`;
@@ -135,6 +142,7 @@ export default class {
     paths.assets_js       = `${paths.base}/${directories.assets}/${directories.assets_js}`;
     paths.assets_static   = directories.assets_static.map((p) => `${paths.assets}/${p}`);
     paths.build           = `${paths.base}/${directories.build}`;
+    paths.build_json      = `${paths.base}/${directories.build}/${directories.build_json}`;
 
     paths.jspm_config     = `${paths.base}/${opts.assets.jspm_config_path}`;
     paths.jspm_packages   = `${paths.base}/${opts.assets.jspm_packages_path}`;

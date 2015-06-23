@@ -209,7 +209,8 @@ new StaticBase(__dirname, {
     jspm_packages_path: "lib/jspm_packages",
   },
   build: {
-    directory: "build"
+    directory: "build",
+    json_directory: "data"
   }
 });
 ```
@@ -220,7 +221,6 @@ new StaticBase(__dirname, {
 
 - Production build option (enable/disable sourcemaps, minified js & css)
 - More handlebars helpers (better ways to loop over collections & pages)
-- Export json object
 - Export handlebars templates to javascript
 - Initial state and data object in html (optional)
 - Add support for multiple languages

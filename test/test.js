@@ -142,6 +142,12 @@ describe("Output", function() {
     });
   });
 
+  it("should build a json file", function() {
+    return build_promise.then(function() {
+      assert_exist(`${paths.build_json}/default.json`);
+    });
+  });
+
 
 });
 
