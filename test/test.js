@@ -1,4 +1,5 @@
-import { assert } from "chai";
+import chai from "chai";
+import chai_as_promised from "chai-as-promised";
 import fs from "fs";
 import path from "path";
 
@@ -6,6 +7,12 @@ import StaticBase from "../lib/main";
 
 
 const DEFAULT_ENCODING = "utf-8";
+
+
+chai.use(chai_as_promised);
+
+
+let assert = chai.assert;
 
 
 /// Test custom paths
@@ -88,6 +95,10 @@ describe("Output", function() {
     `${paths.build}/index.html`,
     { encoding: DEFAULT_ENCODING }
   );
+
+  it("should make a successful build", function() {
+    return assert.isFulfilled(build_promise);
+  });
 
   it("should build the correct html files and paths", function() {
     return build_promise.then(function() {

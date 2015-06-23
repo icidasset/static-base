@@ -218,7 +218,6 @@ new StaticBase(__dirname, {
 
 ## Todo list
 
-- Write more extensive tests
 - Production build option (enable/disable sourcemaps, minified js & css)
 - More handlebars helpers (better ways to loop over collections & pages)
 - Export json object
