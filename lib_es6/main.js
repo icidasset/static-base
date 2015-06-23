@@ -95,7 +95,7 @@ export default class {
   clean_options(base_path, options) {
     let obj = Object.assign({ base_path: base_path }, options);
 
-    utils.obj_ensure(obj, "content.frontmatter");
+    utils.obj_ensure(obj, "content/frontmatter");
     utils.obj_ensure(obj, "assets");
 
     // jspm paths
@@ -127,13 +127,13 @@ export default class {
     let paths = {};
     let directories = {};
 
-    directories.content       = utils.obj_get(opts, "content.directory") || "content";
-    directories.assets        = utils.obj_get(opts, "assets.directory") || "assets";
-    directories.assets_css    = utils.obj_get(opts, "assets.css_directory") || "stylesheets";
-    directories.assets_js     = utils.obj_get(opts, "assets.js_directory") || "javascripts";
-    directories.assets_static = utils.obj_get(opts, "assets.static_directories") || [];
-    directories.build         = utils.obj_get(opts, "build.directory") || "build";
-    directories.build_json    = utils.obj_get(opts, "build.json_directory") || "data";
+    directories.content       = utils.obj_get(opts, "content/directory") || "content";
+    directories.assets        = utils.obj_get(opts, "assets/directory") || "assets";
+    directories.assets_css    = utils.obj_get(opts, "assets/css_directory") || "stylesheets";
+    directories.assets_js     = utils.obj_get(opts, "assets/js_directory") || "javascripts";
+    directories.assets_static = utils.obj_get(opts, "assets/static_directories") || [];
+    directories.build         = utils.obj_get(opts, "build/directory") || "build";
+    directories.build_json    = utils.obj_get(opts, "build/json_directory") || "data";
 
     paths.base            = opts.base_path.replace(/\/+$/, "");
     paths.content         = `${paths.base}/${directories.content}`;
@@ -147,6 +147,7 @@ export default class {
     paths.jspm_config     = `${paths.base}/${opts.assets.jspm_config_path}`;
     paths.jspm_packages   = `${paths.base}/${opts.assets.jspm_packages_path}`;
     paths.node_modules    = `${paths.base}/${opts.node_modules_path}`;
+    paths.node_modules_sb = `${paths.node_modules}/static-base/node_modules`;
 
     utils.obj_traverse(paths, function(v, k) {
       if (typeof v === "string") paths[k] = path.normalize(v);

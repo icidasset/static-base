@@ -7,7 +7,7 @@ import * as utils from "./utils";
 /// Make Tree
 ///
 export function make_tree(static_base) {
-  let collections = utils.obj_get(static_base.options, "content.collections");
+  let collections = utils.obj_get(static_base.options, "content/collections");
   let big_tree = {};
 
   // parsers

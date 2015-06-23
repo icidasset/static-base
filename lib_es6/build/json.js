@@ -31,7 +31,7 @@ function build_json(static_base) {
 /// Build
 ///
 export function build(static_base) {
-  console.log("> Build JSON");
+  console.log("> Build json");
 
   build_json(static_base);
 }

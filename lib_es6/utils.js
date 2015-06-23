@@ -91,12 +91,12 @@ export function clean_path(path: string) {
 /// Get value
 ///
 export function obj_get(obj, path) {
-  return traverse(obj).get(path.split("."));
+  return traverse(obj).get(path.split("/"));
 }
 
 
 export function obj_set(obj, path, value) {
-  return traverse(obj).set(path.split("."), value);
+  return traverse(obj).set(path.split("/"), value);
 }
 
 

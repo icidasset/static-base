@@ -4,6 +4,7 @@ import fse from "fs-extra";
 import json_beautify from "json-beautify";
 import jspm from "jspm";
 import path from "path";
+import { execSync } from "child_process";
 
 import * as utils from "../utils";
 
@@ -49,7 +50,7 @@ function add_jspm_to_package_json(paths, dirs, opts) {
 }
 
 
-/// JSPM -> application.js
+/// JSPM -> config.js
 ///
 function copy_jspm_config(paths, dirs) {
   fse.copySync(
@@ -59,6 +60,8 @@ function copy_jspm_config(paths, dirs) {
 }
 
 
+/// JSPM -> application.js
+///
 function run_jspm(paths, dirs, minify) {
   jspm.setPackagePath(paths.base);
 
@@ -82,13 +85,38 @@ function run_jspm(paths, dirs, minify) {
 }
 
 
+/// Handlebars templates
+///
+function build_handlebars_templates(paths, dirs, minify) {
+  fse.mkdirsSync(`${paths.build}/${dirs.assets}/${dirs.assets_js}`);
+
+  let cmd = [
+    `${paths.node_modules_sb}/.bin/handlebars`,
+    `${paths.base}/templates`,
+    `--output ${paths.build}/${dirs.assets}/${dirs.assets_js}/handlebars_templates.js`,
+    `--commonjs`,
+    `--extension hbs`,
+    minify ? `--min` : ``
+  ];
+
+  execSync(cmd.join(" "));
+}
+
+
 /// <Build>
 ///
 export function build(static_base, minify=false) {
   console.log("> Build javascripts");
 
+  let paths = static_base.paths;
+  let dirs = static_base.directories;
+
   if (utils.file_exists(`${static_base.paths.assets_js}/application.js`)) {
-    add_jspm_to_package_json(static_base.paths, static_base.directories, static_base.options);
-    return run_jspm(static_base.paths, static_base.directories, minify);
+    add_jspm_to_package_json(paths, dirs, static_base.options);
+
+    return Promise.all([
+      run_jspm(paths, dirs, minify),
+      build_handlebars_templates(paths, dirs, minify)
+    ]);
   }
 }

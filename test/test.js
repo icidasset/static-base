@@ -88,6 +88,8 @@ describe("Output", function() {
   let paths = inst.paths;
   let dirs = inst.directories;
 
+  paths.node_modules_sb = paths.node_modules;
+
   inst.clean();
 
   let build_promise = inst.build("all");

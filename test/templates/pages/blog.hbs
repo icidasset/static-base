@@ -1,4 +1,18 @@
 <h1>{{title}}</h1>
 
 
-<ul></ul>
+<ul>
+  {{#each __tree}}
+    {{#ifStartsWith __key "blog/"}}
+
+      <div>
+        <h2>
+          <a href="{{relative_path __route @root.__route}}">
+            {{title}}
+          </a>
+        </h2>
+      </div>
+
+    {{/ifStartsWith}}
+  {{/each}}
+</ul>
