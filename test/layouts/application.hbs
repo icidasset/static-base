@@ -1,7 +1,9 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
   <title>{{#if title}}{{title}} &mdash; {{/if}}Static Base Test</title>
+
+  <link rel="stylesheet" href="{{asset_path 'stylesheets/application.css'}}" />
 </head>
 <body>
 
@@ -9,7 +11,15 @@
     {{> navigation}}
   </nav>
 
+
   {{{yield}}}
+
+
+  <script src="{{asset_path 'javascripts/handlebars.js'}}"></script>
+  <script src="{{asset_path 'javascripts/handlebars_helpers.js'}}"></script>
+  <script src="{{asset_path 'javascripts/handlebars_templates_partials.js'}}"></script>
+  <script src="{{asset_path 'javascripts/handlebars_templates_pages.js'}}"></script>
+  <script src="{{asset_path 'javascripts/application.js'}}"></script>
 
 </body>
 </html>

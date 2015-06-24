@@ -38,7 +38,7 @@ export default class {
 
   /// Build
   ///
-  build(partial=false, minify=false) {
+  build(partial=false, options={}) {
     let promises = [];
 
     if (!this.is_ready) {
@@ -51,33 +51,33 @@ export default class {
     switch (partial) {
 
       case "html":
-        promises.push( build_html(this, minify) );
+        promises.push( build_html(this, options) );
         break;
 
       case "css":
       case "stylesheets":
-        promises.push( build_stylesheets(this, minify) );
+        promises.push( build_stylesheets(this, options) );
         break;
 
       case "js":
       case "javascripts":
-        promises.push( build_javascripts(this, minify) );
+        promises.push( build_javascripts(this, options) );
         break;
 
       case "static_assets":
-        promises.push( build_static_assets(this) );
+        promises.push( build_static_assets(this, options) );
         break;
 
       case "json":
-        promises.push( build_json(this) );
+        promises.push( build_json(this, options) );
         break;
 
       default:
-        promises.push( build_html(this, minify) );
-        promises.push( build_stylesheets(this, minify) );
-        promises.push( build_javascripts(this, minify) );
-        promises.push( build_static_assets(this) );
-        promises.push( build_json(this) );
+        promises.push( build_html(this, options) );
+        promises.push( build_stylesheets(this, options) );
+        promises.push( build_javascripts(this, options) );
+        promises.push( build_static_assets(this, options) );
+        promises.push( build_json(this, options) );
     }
 
     return Promise.all(promises);
@@ -86,8 +86,8 @@ export default class {
 
   /// CLI commands
   ///
-  clean() { if (this.is_ready) { clean(this); }}
-  watch() { if (this.is_ready) { watch(this); }}
+  clean(options={}) { if (this.is_ready) { clean(this, options); }}
+  watch(options={}) { if (this.is_ready) { watch(this, options); }}
 
 
   /// Options

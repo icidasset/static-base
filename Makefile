@@ -1,4 +1,4 @@
-.PHONY: build test
+.PHONY: build test test_server
 
 # variables
 BIN=./node_modules/.bin
@@ -14,3 +14,6 @@ build:
 
 test:
 	npm test
+
+test_server:
+	$(BIN)/static ./test/build

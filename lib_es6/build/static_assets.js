@@ -67,7 +67,7 @@ function copy_collection_assets(paths, dirs, tree) {
 
 /// Build
 ///
-export function build(static_base) {
+export function build(static_base, options={}) {
   console.log("> Build static assets");
 
   let paths = static_base.paths;

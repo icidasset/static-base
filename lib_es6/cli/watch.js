@@ -40,7 +40,7 @@ function watch_handler(event, path) {
 }
 
 
-export default function(static_base) {
+export default function(static_base, options={}) {
   console.log("> Watch");
 
   chokidar

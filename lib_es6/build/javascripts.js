@@ -62,7 +62,7 @@ function copy_jspm_config(paths, dirs) {
 
 /// JSPM -> application.js
 ///
-function run_jspm(paths, dirs, minify) {
+function run_jspm(paths, dirs, options) {
   jspm.setPackagePath(paths.base);
 
   // install, build jspm & return promise
@@ -75,7 +75,7 @@ function run_jspm(paths, dirs, minify) {
     return jspm.bundleSFX(
       `${paths.assets_js}/application.js`,
       `${paths.build}/${dirs.assets}/${dirs.assets_js}/application.js`,
-      { sourceMaps: !minify, minify: minify }
+      { sourceMaps: options.sourceMaps, minify: options.minify }
     );
 
   }).then(function() {
@@ -85,18 +85,77 @@ function run_jspm(paths, dirs, minify) {
 }
 
 
-/// Handlebars templates
+/// Handlebars -> library
 ///
-function build_handlebars_templates(paths, dirs, minify) {
+function copy_handlebars_library(paths, dirs, options) {
+  let lib_dir = `${paths.node_modules_sb}/handlebars/dist`;
+  let hbs_dest = `${paths.build}/${dirs.assets}/${dirs.assets_js}/handlebars.js`;
+  let hbs_runtime_dest = `${paths.build}/${dirs.assets}/${dirs.assets_js}/handlebars.runtime.js`;
+
+  if (!utils.file_exists(hbs_dest, false)) {
+    fse.copySync(
+      `${lib_dir}/handlebars${options.minify ? ".min" : ""}.js`,
+      hbs_dest
+    );
+
+    fse.copySync(
+      `${lib_dir}/handlebars.runtime${options.minify ? ".min" : ""}.js`,
+      hbs_runtime_dest
+    );
+  }
+}
+
+
+/// Handlebars -> helpers
+///
+function copy_handlebars_helpers(paths, dirs, options) {
+  let sb_base = path.resolve(paths.node_modules_sb, "../");
+  let dest = `${paths.build}/${dirs.assets}/${dirs.assets_js}/handlebars_helpers.js`;
+
+  if (!utils.file_exists(dest, false)) {
+    let cmd = [
+      `${paths.node_modules}/.bin/browserify`,
+      `"${sb_base}/lib/handlebars/browserify.js"`,
+    ];
+
+    if (options.minify) {
+      cmd.push(`| ${paths.node_modules}/.bin/uglifyjs --compress`);
+    }
+
+    cmd.push(`> ${dest}`);
+    cmd = cmd.join(` `);
+
+    execSync(cmd);
+  }
+}
+
+
+/// Handlebars -> templates
+///
+function build_handlebars_templates(paths, dirs, options) {
+  let cmd;
+
   fse.mkdirsSync(`${paths.build}/${dirs.assets}/${dirs.assets_js}`);
 
-  let cmd = [
+  // pages
+  cmd = [
     `${paths.node_modules_sb}/.bin/handlebars`,
-    `${paths.base}/templates`,
-    `--output ${paths.build}/${dirs.assets}/${dirs.assets_js}/handlebars_templates.js`,
-    `--commonjs`,
+    `${paths.base}/templates/pages`,
+    `--output ${paths.build}/${dirs.assets}/${dirs.assets_js}/handlebars_templates_pages.js`,
     `--extension hbs`,
-    minify ? `--min` : ``
+    options.minify ? `--min` : ``
+  ];
+
+  execSync(cmd.join(" "));
+
+  // partials
+  cmd = [
+    `${paths.node_modules_sb}/.bin/handlebars`,
+    `${paths.base}/templates/partials`,
+    `--output ${paths.build}/${dirs.assets}/${dirs.assets_js}/handlebars_templates_partials.js`,
+    `--extension hbs`,
+    `--partial`,
+    options.minify ? `--min` : ``
   ];
 
   execSync(cmd.join(" "));
@@ -105,7 +164,7 @@ function build_handlebars_templates(paths, dirs, minify) {
 
 /// <Build>
 ///
-export function build(static_base, minify=false) {
+export function build(static_base, options={}) {
   console.log("> Build javascripts");
 
   let paths = static_base.paths;
@@ -114,9 +173,10 @@ export function build(static_base, minify=false) {
   if (utils.file_exists(`${static_base.paths.assets_js}/application.js`)) {
     add_jspm_to_package_json(paths, dirs, static_base.options);
 
-    return Promise.all([
-      run_jspm(paths, dirs, minify),
-      build_handlebars_templates(paths, dirs, minify)
-    ]);
+    build_handlebars_templates(paths, dirs, options);
+    copy_handlebars_helpers(paths, dirs, options);
+    copy_handlebars_library(paths, dirs, options);
+
+    return run_jspm(paths, dirs, options);
   }
 }

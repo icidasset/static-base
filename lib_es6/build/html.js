@@ -63,7 +63,7 @@ function register_handlebars_helpers(isolated_handlebars) {
 
 /// <Build>
 ///
-export function build(static_base, minify=false) {
+export function build(static_base, options={}) {
   console.log("> Build html");
 
   let isolated_handlebars = handlebars.create();
@@ -88,7 +88,7 @@ export function build(static_base, minify=false) {
       Object.assign({ yield: page_template(page_template_data) }, page_template_data)
     );
 
-    if (minify) {
+    if (options.minify) {
       html = minify_html(html, {
         collapseWhitespace: true,
         removeComments: true,

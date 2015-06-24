@@ -30,7 +30,7 @@ function build_json(static_base) {
 
 /// Build
 ///
-export function build(static_base) {
+export function build(static_base, options={}) {
   console.log("> Build json");
 
   build_json(static_base);

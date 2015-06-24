@@ -75,12 +75,18 @@ instance.build().then(function() {
 // make a partial build
 instance.build("html");
 
-// make a production build (minified and no sourcemaps)
-instance.build("all", true);
+// build with source maps
+instance.build("js", { sourceMaps: true });
+
+// make a production build
+instance.build("all", { minify: true });
 
 // cli commands
-// 1. clean - remove everything in the build directory, except the jspm_packages directory
+// 1. clean - remove everything in the build directory,
+//            except the jspm_packages & javascript directories
+//            (i.e. if the 'hard' option is not given)
 instance.clean();
+instance.clean({ hard: true });
 
 // 2. watch - for changes
 instance.watch();

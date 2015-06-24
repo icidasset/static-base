@@ -10,7 +10,9 @@
   "globals": {
     "describe": true,
     "it": true,
-    "process": true
+    "process": true,
+
+    "Handlebars": true
   },
   "parser": "babel-eslint",
   "rules": {

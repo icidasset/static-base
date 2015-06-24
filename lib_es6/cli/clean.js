@@ -1,7 +1,7 @@
-import { exec } from "child_process";
+import { execSync } from "child_process";
 
 
-function build_command(static_base) {
+function build_command(static_base, hard=false) {
   let build_path = static_base.paths.build;
 
   let cmd = [
@@ -9,10 +9,13 @@ function build_command(static_base) {
   ];
 
   let ignore = [
-    `${build_path}/${static_base.directories.assets}/jspm_packages`,
-    `${build_path}/${static_base.directories.assets}$`,
     `${build_path}$`
-  ];
+  ].concat(hard ? [] : [
+    `${build_path}/${static_base.directories.assets}/${static_base.directories.assets_js}`,
+    `${build_path}/${static_base.directories.assets}$`,
+
+    `${static_base.options.assets.jspm_packages_path}`
+  ]);
 
   cmd = cmd.concat(
     ignore.map(function(i) {
@@ -25,7 +28,7 @@ function build_command(static_base) {
 }
 
 
-export default function(static_base) {
+export default function(static_base, options={}) {
   console.log("> Clean");
-  exec(build_command(static_base));
+  execSync(build_command(static_base, options.hard));
 }
