@@ -57,9 +57,7 @@ function retrieve_templates(isolated_handlebars, base_path: string) {
 
 
 function register_handlebars_helpers(isolated_handlebars) {
-  utils.obj_traverse(handlebars_helpers, function(fn, name) {
-    isolated_handlebars.registerHelper(name, fn);
-  });
+  isolated_handlebars.registerHelper(handlebars_helpers);
 }
 
 
@@ -90,13 +88,15 @@ export function build(static_base, minify=false) {
       Object.assign({ yield: page_template(page_template_data) }, page_template_data)
     );
 
-    html = minify_html(html, {
-      collapseWhitespace: true,
-      removeComments: true,
-      removeCommentsFromCDATA: true,
-      minifyJS: true,
-      minifyCSS: true
-    });
+    if (minify) {
+      html = minify_html(html, {
+        collapseWhitespace: true,
+        removeComments: true,
+        removeCommentsFromCDATA: true,
+        minifyJS: true,
+        minifyCSS: true
+      });
+    }
 
     // make html file
     fse.mkdirsSync(`${static_base.paths.build}/${html_path_dir}`);

@@ -222,8 +222,6 @@ new StaticBase(__dirname, {
 
 ## Todo list
 
-- More handlebars helpers (better ways to loop over collections & pages)
-- Export handlebars templates to javascript
 - Initial state and data object in html (optional)
 - Add support for multiple languages
 - Add support for multiple layouts (html frontmatter)

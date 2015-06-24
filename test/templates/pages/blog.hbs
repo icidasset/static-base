@@ -2,17 +2,7 @@
 
 
 <ul>
-  {{#each __tree}}
-    {{#ifStartsWith __key "blog/"}}
-
-      <div>
-        <h2>
-          <a href="{{relative_path __route @root.__route}}">
-            {{title}}
-          </a>
-        </h2>
-      </div>
-
-    {{/ifStartsWith}}
-  {{/each}}
+  {{#childPages}}
+    <li><a href="{{relative_route}}">{{title}}</a></li>
+  {{/childPages}}
 </ul>
