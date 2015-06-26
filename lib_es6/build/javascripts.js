@@ -114,12 +114,13 @@ function copy_handlebars_helpers(paths, dirs, options) {
 
   if (!utils.file_exists(dest, false)) {
     let cmd = [
-      `${paths.node_modules}/.bin/browserify`,
+      `${paths.node_modules_sb}/.bin/browserify`,
       `"${sb_base}/lib/handlebars/browserify.js"`,
+      `--standalone static_base_handlebars_helpers`
     ];
 
     if (options.minify) {
-      cmd.push(`| ${paths.node_modules}/.bin/uglifyjs --compress`);
+      cmd.push(`| ${paths.node_modules_sb}/.bin/uglifyjs --compress`);
     }
 
     cmd.push(`> ${dest}`);

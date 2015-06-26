@@ -14,9 +14,8 @@ import fse from "fs-extra";
 ///
 function build_json(static_base) {
   let obj = {
-    collections_tree: static_base.collections_tree,
-    pages_tree: static_base.pages_tree,
-    navigation_items: static_base.navigation_items
+    __tree: static_base.pages_tree,
+    __navigation_items: static_base.navigation_items
   };
 
   let json = JSON.stringify(
