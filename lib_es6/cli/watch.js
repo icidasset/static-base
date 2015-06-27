@@ -18,13 +18,14 @@ function watch_handler(event, path) {
 
   } else if (path.endsWith(".js")) {
     if (path.match(/^lib\//)) {
-      this.build();
+      console.log(colors.yellow("{!} Restart the watch command."));
     } else {
       this.build("javascripts");
     }
 
   } else if (path.endsWith(".hbs")) {
     this.build("html");
+    this.build("javascripts");
 
   } else if (path.match(/^content\//)) {
     this.build("html");
