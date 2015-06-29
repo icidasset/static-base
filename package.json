@@ -1,6 +1,6 @@
 {
   "name": "static-base",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "An opinionated set of tools to make static websites",
   "main": "lib/main.js",
   "keywords": [
@@ -36,6 +36,6 @@
     "node-static": "^0.7.6"
   },
   "scripts": {
-    "test": "mocha --compilers js:babel/register --timeout 30000"
+    "test": "mocha --compilers js:babel/register --timeout 60000"
   }
 }

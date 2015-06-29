@@ -24,10 +24,12 @@ function watch_handler(event, path) {
     }
 
   } else if (path.endsWith(".hbs")) {
+    this.make_trees();
     this.build("html");
     this.build("javascripts");
 
   } else if (path.match(/^content\//)) {
+    this.make_trees();
     this.build("html");
     this.build("json");
     this.build("static_assets");

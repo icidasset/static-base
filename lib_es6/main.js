@@ -43,9 +43,8 @@ export default class {
 
     if (!this.is_ready) {
       return false;
-    } else if (!this.pages_tree) {
-      this.collections_tree = collections.make_tree(this);
-      [this.pages_tree, this.navigation_items] = pages.make_tree(this);
+    } else if (!this.has_trees()) {
+      this.make_trees();
     }
 
     switch (partial) {
@@ -81,6 +80,17 @@ export default class {
     }
 
     return Promise.all(promises);
+  }
+
+
+  make_trees() {
+    this.collections_tree = collections.make_tree(this);
+    [this.pages_tree, this.navigation_items] = pages.make_tree(this);
+  }
+
+
+  has_trees() {
+    return !!this.pages_tree;
   }
 
 
