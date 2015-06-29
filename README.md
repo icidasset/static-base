@@ -1,6 +1,6 @@
 # Static Base
 
-An optionated set of tools for building static websites.  
+An opinionated set of tools for building static websites.  
 Uses handlebars, markdown and toml.
 
 
