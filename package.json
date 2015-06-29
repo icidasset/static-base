@@ -1,7 +1,7 @@
 {
   "name": "static-base",
   "version": "0.0.8",
-  "description": "An opinionated set of tools to make static websites",
+  "description": "An opinionated set of tools for building static websites",
   "main": "lib/main.js",
   "keywords": [
     "static"
