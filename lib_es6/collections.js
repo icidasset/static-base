@@ -13,10 +13,20 @@ export function make_tree(static_base) {
   // parsers
   let parsers = {
     parse_toml_file: utils.parse_toml_file,
+    parse_toml: utils.parse_toml,
+
     parse_markdown_file: function(file_path) {
       return utils.parse_markdown_file(
         static_base.markdown_parser,
         file_path,
+        !!static_base.options.content.frontmatter.use_toml_syntax
+      );
+    },
+
+    parse_markdown: function(contents) {
+      return utils.parse_markdown(
+        static_base.markdown_parser,
+        contents,
         !!static_base.options.content.frontmatter.use_toml_syntax
       );
     }

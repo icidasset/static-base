@@ -9,7 +9,7 @@ export const DEFAULT_ENCODING = "utf-8";
 
 
 /// {Parsing}
-/// Parse TOML file
+/// Parse TOML
 ///
 export function parse_toml_file(file_path: string) {
   let obj;
@@ -24,21 +24,35 @@ export function parse_toml_file(file_path: string) {
 }
 
 
-/// Parse Markdown file
+export function parse_toml(contents: string) {
+  return toml.parse(contents);
+}
+
+
+/// Parse Markdown
 ///
 export function parse_markdown_file(parser, file_path: string, front_matter_use_toml=false) {
   let file_contents_as_string = fs.readFileSync(file_path, { encoding: DEFAULT_ENCODING });
-  let front_matter_parser = front_matter_use_toml ? toml.parse : false;
-  let front_matter, parsed_markdown, result;
+  let result;
 
   try {
-    front_matter = matter(file_contents_as_string, { parser: front_matter_parser });
-    parsed_markdown = parser.render(front_matter.content);
+    result = parse_markdown(parser, file_contents_as_string, front_matter_use_toml);
   } catch (e) {
     console.error(`Markdown parsing error in '${file_path}': ${e.message}.`);
   }
 
-  if (front_matter) {
+  return result;
+}
+
+
+export function parse_markdown(parser, contents: string, front_matter_use_toml=false) {
+  let front_matter_parser = front_matter_use_toml ? toml.parse : false;
+  let front_matter, parsed_markdown, result;
+
+  front_matter = matter(contents, { parser: front_matter_parser });
+  parsed_markdown = front_matter ? parser.render(front_matter.content) : null;
+
+  if (parsed_markdown) {
     result = Object.assign({ parsed_markdown: parsed_markdown }, front_matter.data);
     result.title = result.title || extract_title_from_markdown(front_matter.content);
 

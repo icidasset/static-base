@@ -1,6 +1,6 @@
 {
   "name": "static-base",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "An opinionated set of tools for building static websites",
   "main": "lib/main.js",
   "keywords": [
@@ -22,6 +22,7 @@
     "markdown-it": "^4.2.1",
     "node-bourbon": "^4.2.3",
     "node-sass": "^3.1.2",
+    "sort-on": "^1.2.2",
     "toml": "^2.2.2",
     "traverse": "^0.6.6",
     "uglify-js": "^2.4.23",

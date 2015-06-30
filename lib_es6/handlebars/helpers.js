@@ -1,3 +1,6 @@
+import sortOn from "sort-on";
+
+
 ///
 /// [Private]
 ///
@@ -57,11 +60,29 @@ export function childPages(options) {
 
   if (options.data && options.data.root) {
     let root_key = `${options.data.root.__key}/`;
+    let sort_by = options.hash.sortBy || "__key";
+    let tree_keys = [];
 
-    Object.keys(options.data.root.__tree || []).forEach(function(tree_key) {
+    Object.keys(options.data.root.__tree).forEach(function(tree_key) {
+      let obj;
+
       if (tree_key.indexOf(root_key) === 0) {
-        output = output + options.fn(options.data.root.__tree[tree_key]);
+        obj = options.data.root.__tree[tree_key];
+
+        tree_keys.push({
+          key: tree_key,
+          sort_by: obj[sort_by]
+        });
       }
+    });
+
+    tree_keys = sortOn(tree_keys, "sort_by");
+
+    let sort_dir = (options.hash.sortDirection || "ASC").toUpperCase();
+    if (sort_dir === "DESC") tree_keys = tree_keys.reverse();
+
+    tree_keys.forEach(function(t) {
+      output = output + options.fn(options.data.root.__tree[t.key]);
     });
   }
 

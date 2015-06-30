@@ -42,8 +42,13 @@ function copy_collection_assets(paths, dirs, tree) {
   utils.obj_traverse(tree, function(collection_obj, collection_key) {
 
     traverse(collection_obj).forEach(function(value) {
-      let value_is_object = (typeof value === "object");
-      let assets_is_array = (Object.prototype.toString.call(value.assets) === "[object Array]");
+      let value_is_object;
+      let assets_is_array;
+
+      if (value) {
+        value_is_object = (typeof value === "object");
+        assets_is_array = (Object.prototype.toString.call(value.assets) === "[object Array]");
+      }
 
       if (value_is_object && assets_is_array) {
         let destination = `${paths.build}/${dirs.assets}/collections/${collection_key}`;
