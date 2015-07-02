@@ -228,7 +228,8 @@ new StaticBase(__dirname, {
 
 ## Todo list
 
-- Initial state and data object in html (optional)
+- collection_asset_path handlebars helper
 - Add support for multiple languages
 - Add support for multiple layouts (html frontmatter)
+- Initial state and data object in html (optional)
 - Add some basic client-side javascript stuff?
