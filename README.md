@@ -228,6 +228,7 @@ new StaticBase(__dirname, {
 
 ## Todo list
 
+- Replace 'colors.js' with [https://github.com/chalk/chalk]()
 - collection_asset_path handlebars helper
 - Add support for multiple languages
 - Add support for multiple layouts (html frontmatter)
