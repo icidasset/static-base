@@ -8,12 +8,12 @@ function path_to_root_prefix(current_route) {
   if (!current_route || current_route.length === 0) {
     return "";
   } else {
-    var split = current_route.split("/");
-    var path_prefix = "";
+    let split = current_route.split("/");
+    let path_prefix = "";
 
-    for (let s of split) {
+    split.forEach(function(s) {
       if (s !== "") path_prefix += "../";
-    }
+    });
 
     return path_prefix;
   }
@@ -154,7 +154,7 @@ export function ifStartsWith(val, check, options) {
 
 
 export function linkTo(obj, current_route, options) {
-  var href;
+  let href;
 
   if (typeof obj === "string") {
     href = obj;
