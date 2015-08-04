@@ -1,6 +1,6 @@
 {
   "name": "static-base",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "An opinionated set of tools for building static websites",
   "main": "lib/main.js",
   "keywords": [
