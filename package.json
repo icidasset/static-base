@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "A small functional toolset for building static websites",
   "main": "lib/index.js",
+  "jsnext:main": "lib/index.js",
   "keywords": [
     "static"
   ],
@@ -10,6 +11,7 @@
   "license": "MIT",
   "repository": "icidasset/static-base",
   "dependencies": {
+    "babel-preset-metalab": "^0.2.1",
     "glob": "^7.0.0",
     "glob-parent": "^2.0.0",
     "pflow": "^1.0.0"
