@@ -4,8 +4,6 @@ A small functional toolset for building static websites.
 Check out [static-base-contrib](https://github.com/icidasset/static-base)
 for some functions.
 
-__Work in progress.__
-
 
 ## Usage
 
@@ -15,14 +13,14 @@ import { run } from 'static-base';
 
 run(
   read,
-  [frontmatter, 'yaml']
+  [write, 'build']
 )(
   'src/**/*.html',
   process.cwd() // root directory
 );
 
 
-function read(deps, files) {
+function read(files, deps) {
   return files.map((f) => {
     return {
       ...f,
@@ -32,15 +30,13 @@ function read(deps, files) {
 }
 
 
-function frontmatter(lang, deps, files) {
-  return files.map((f) => {
-    const m = graymatter(f.content, { lang });
-
-    return {
-      ...f,
-      metadata: { ...f.metadata, ...m.data },
-      content: m.content,
-    };
+function write(files, deps, destination) {
+  files.forEach((f) => {
+    const dir = join(f.root, destination, f.dirname);
+    mkdirp.sync(dir);
+    fs.writeFileSync(join(dir, `${f.basename}${f.extname}`), f.content);
   });
+
+  return [...files];
 }
 ```
