@@ -1,6 +1,6 @@
 {
   "name": "static-base",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A small functional toolset for building static websites",
   "main": "lib/index.js",
   "jsnext:main": "lib/index.js",
@@ -11,9 +11,17 @@
   "license": "MIT",
   "repository": "icidasset/static-base",
   "dependencies": {
-    "babel-preset-metalab": "^0.2.1",
     "glob": "^7.0.0",
     "glob-parent": "^2.0.0",
     "pflow": "^1.0.0"
+  },
+  "scripts": {
+    "compile": "babel -d lib/ src/",
+    "prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.6.5",
+    "babel-core": "^6.7.2",
+    "babel-preset-metalab": "^0.2.1"
   }
 }

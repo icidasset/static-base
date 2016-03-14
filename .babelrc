@@ -2,10 +2,5 @@
   "presets": [
     "metalab",
     "metalab/compatibility"
-  ],
-  "env": {
-    "development": {
-      "sourceMaps": true
-    }
-  }
+  ]
 }
