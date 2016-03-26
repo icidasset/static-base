@@ -12,8 +12,9 @@ paths = [
 ]
 
 deps = {
-  root: '/Users/icidasset/Projects/icid-asset',
+  root: '/Users/icidasset/Projects/portfolio',
   wd: 'src/templates',
+  pattern: '**\/*.ext',
 }
 
 Output:
@@ -21,13 +22,15 @@ Output:
 [
   {
     path: 'sub/example.ext',
-    entirePath: '/Users/icidasset/Projects/icid-asset/src/templates/sub/example.ext',
+    entirePath: '/Users/icidasset/Projects/portfolio/src/templates/sub/example.ext',
 
     wd: 'src/templates',
-    root: '/Users/icidasset/Projects/icid-asset',
+    root: '/Users/icidasset/Projects/portfolio',
     dirname: 'sub',
     basename: 'example',
     extname: '.ext',
+
+    pattern: '**\/*.ext',
   }
 ]
 
@@ -44,6 +47,7 @@ export function buildDefinition(path, deps) {
     path: cleanedPath,
     entirePath: pathUtils.join(deps.root, deps.wd, cleanedPath),
 
+    pattern: deps.pattern,
     wd: deps.wd,
     root: deps.root,
     dirname: cleanPath(pathUtils.dirname(cleanedPath), { beginning: true, end: true }),

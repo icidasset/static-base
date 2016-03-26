@@ -8,11 +8,15 @@ import glob from 'glob';
  * @return {string[]} List of file paths relative from deps.wd
  */
 export default function(pattern, deps) {
-  if (pattern) {
-    return glob
-    .sync(pattern, { cwd: deps.root })
-    .map(p => p.replace(new RegExp(`^${deps.wd}`), ''));
-  }
+  return new Promise((resolve, reject) => {
+    glob(pattern, { cwd: deps.root }, (err, matches) => {
+      if (err) return reject(err);
 
-  return [];
+      const matchesWithoutWorkDirectory = matches.map((p) => {
+        return p.replace(new RegExp(`^\/?${deps.wd}\/?`), '');
+      });
+
+      resolve(matchesWithoutWorkDirectory);
+    });
+  });
 }
