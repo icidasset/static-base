@@ -1,7 +1,7 @@
 # Static Base
 
 A small functional toolset for building static websites.  
-Check out [static-base-contrib](https://github.com/icidasset/static-base)
+Check out [static-base-contrib](https://github.com/icidasset/static-base-contrib)
 for some pre-build functions.
 
 
