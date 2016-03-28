@@ -4,8 +4,8 @@ import glob from 'glob';
 /**
  * Makes a list of all the files that match the given glob pattern.
  * @param {string} pattern
- * @param {Object} deps - See index.js for a description of this param
- * @return {string[]} List of file paths relative from deps.wd
+ * @param {Dependencies} deps
+ * @return {string[]} List of file paths relative from deps.wd (paths)
  */
 export default function(pattern, deps) {
   return new Promise((resolve, reject) => {

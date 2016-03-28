@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import { build as dictionary } from './lib/dictionary';
+import { buildDictionary } from './lib/dictionary';
 import { run } from './lib';
 import list from './lib/list';
 
@@ -25,7 +25,7 @@ test('should make a valid dictionary', t => {
   const wd = 'wd';
   const root = '/root';
 
-  const dict = dictionary([path], { pattern, wd, root });
+  const dict = buildDictionary([path], { pattern, wd, root });
   const fdef = dict[0];
 
   t.is(fdef.pattern, pattern);
@@ -109,6 +109,6 @@ function collectDotFiles() {
 }
 
 
-function metadata(files, deps, data) {
+function metadata(files, data) {
   return files.map(f => { return { ...f, ...data }});
 }
