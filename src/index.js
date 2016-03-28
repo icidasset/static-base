@@ -5,8 +5,22 @@ import list from './list';
 
 
 /**
+ * Has different sets of parameters:
+ *
+ * Set 1:
+ * `(glob_pattern, root_directory_path)`
+ *
+ * Set 2:
+ * {@link Dictionary}
+ *
+ * Set 3:
+ * A Promise of a {@link Dictionary}
+ *
+ * Set 4:
+ * No parameters. Will create a sequence with an empty array.
+ *
  * @callback runCurry
- * @param {...*} args - Opt 1, a pattern + root dir. Opt 2, a root dir. Opt 3, a dictionary. Opt 4, a promise of a dictionary.
+ * @param {...*} args
  * @return {Promise} Returns a promise for a Dictionary
  */
 
@@ -31,7 +45,7 @@ export function run(...sequenceItems) {
 
 
 function _run(sequenceItems, a, b) {
-  let deps, dict, pattern;
+  let deps, dict, pattern, root;
 
   // If given a dictionary
   if (Array.isArray(a)) {
@@ -41,23 +55,23 @@ function _run(sequenceItems, a, b) {
     else return Promise.resolve([]);
 
   // If given a pattern and root directory
-  } else if (typeof a === 'string') {
-    let root;
-
-    if (typeof b === 'string') {
-      pattern = a;
-      root = b;
-    } else {
-      pattern = '';
-      root = a;
-    }
+  } else if (
+    typeof a === 'string' &&
+    typeof b === 'string'
+  ) {
+    pattern = a;
+    root = b;
 
     deps = buildDependencies(pattern, root);
     dict = list(pattern, deps).then(ls => buildDictionary(ls, deps));
 
+  // Running empty
+  } else if (a == null && b == null) {
+    dict = [];
+
   // Otherwise
   } else {
-    return Promise.reject('Insufficient parameters given.');
+    return Promise.reject('Invalid parameters given.');
 
   }
 

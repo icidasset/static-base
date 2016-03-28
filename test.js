@@ -43,12 +43,11 @@ test('should be able to run a sequence, given a pattern and root directory', asy
 });
 
 
-test('should be able to run a sequence, given a root directory', async t => {
+test('should be able to run a sequence, given no parameters', async t => {
   return run(
     [() => { return [{}] }],
-    [metadata, { test: true }])(
-      process.cwd()
-  ).then(dict => {
+    [metadata, { test: true }]
+  )().then(dict => {
     t.is(dict[0].test, true);
   });
 });
@@ -73,7 +72,7 @@ test('should be able to run a sequence, given a promise of a dictionary', async 
 
 test('should reject when given invalid parameters', async t => {
   return t.throws(
-    run([metadata, {}])()
+    run([metadata, {}])(1)
   );
 });
 
