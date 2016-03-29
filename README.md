@@ -47,7 +47,7 @@ run(
 
 ## Documentation
 
-See [http://icidasset.github.io/static-base](http://icidasset.github.io/static-base).
+[http://icidasset.github.io/static-base](http://icidasset.github.io/static-base).
 
 
 
