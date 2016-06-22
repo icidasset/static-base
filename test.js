@@ -56,7 +56,7 @@ test('should be able to run a sequence, given no parameters', async t => {
 test('should be able to run a sequence, given a dictionary', async t => {
   return collectDotFiles().then(dict_a => {
     run()(dict_a).then(dict_b => {
-      t.same(dict_a, dict_b);
+      t.deepEqual(dict_a, dict_b);
       t.is(dict_a[0].path, '.babelrc');
     });
   });
