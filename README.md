@@ -47,13 +47,14 @@ run(
 
 ## Documentation
 
-See [http://icidasset.github.io/static-base](http://icidasset.github.io/static-base).
+[http://icidasset.github.io/static-base](http://icidasset.github.io/static-base)
 
 
 
 ## A detailed example and explanation
 
-__Note:__ This example uses functions from `static-base-contrib`,
+__Note:__ This example uses functions from
+[static-base-contrib](https://github.com/icidasset/static-base-contrib),
 but the explanation should be easy enough to understand without
 any knowledge of said library.
 
