@@ -44,22 +44,22 @@
 
 /* a markup tag name */
 .tag {
-  color: #c82829;
+  color: #8da6ce;
 }
 
 /* a markup attribute name */
 .atn {
-  color: #f5871f;
+  color: #fbde2d;
 }
 
 /* a markup attribute value */
 .atv {
-  color: #3e999f;
+  color: #ddd;
 }
 
 /* a declaration */
 .dec {
-  color: #f5871f;
+  color: #EF5050;
 }
 
 /* a variable name */
