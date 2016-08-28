@@ -56,7 +56,7 @@ run(
 __Note:__ This example uses functions from
 [static-base-contrib](https://github.com/icidasset/static-base-contrib),
 but the explanation should be easy enough to understand without
-any knowledge of said library.
+any knowledge of the contrib library.
 
 ```js
 /**
@@ -66,10 +66,10 @@ any knowledge of said library.
  * the path to each file that matches the given glob pattern.
  */
 const articles = run(
-  [read],                         /* puts content of file in the 'content' attribute */
+  [read],                         /* puts the content of each file in the 'content' property */
   [frontmatter],                  /* extracts the frontmatter from 'content' and parses it */
   [markdown, markdownRenderer],   /* parses 'content' as markdown */
-  [renameExtension, '.html']      /* change the '.md' extension to '.html' */
+  [renameExtension, '.html'],     /* change the '.md' extension to '.html' */
 )(
   'articles/**/*.md',   /* glob pattern that selects all articles */
   process.cwd()         /* path to the root directory of this project */
@@ -84,16 +84,17 @@ const articles = run(
 Promise.all([
   articles
 ]).then(dictionaries => {
-  const collections = {
-    articles: dictionaries[0],
-  };
+  const [articles] = dictionaries;
 
   run(
-    [ metadata, { collections } ],
+    [ metadata, { collections } ],  /* store dictionaries in every file definition */
     [ template, renderHandlebars ], /* e.g. render article layout */
-    [ write, 'build/articles' ]
+    [ write, 'build/articles' ]     /* writes all files to disk */
+                                    /* -> /process_cwd_path/build/articles/path_from_file */
   )(
-    collections.articles
+    [
+      ...articles,
+    ]
   );
 });
 ```

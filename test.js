@@ -1,8 +1,7 @@
-import test from 'ava';
-
 import { buildDictionary } from './lib/dictionary';
 import { run } from './lib';
 import list from './lib/list';
+import test from 'ava';
 
 
 test('should make a valid list', async t => {
@@ -91,8 +90,22 @@ test('should throw when a function doesn\'t return a new array', async t => {
 
 test('should throw when not given a function', async t => {
   return t.throws(
-    run([])(process.cwd())
+    run([])('*', process.cwd())
   );
+});
+
+
+test('should be able to handle dot-slash patterns', async t => {
+  return run()('src/**/*.js', process.cwd()).then(dict => {
+    const sourceoftruth = dict[0];
+
+    return run()('./src/**/*.js', process.cwd()).then(dict => {
+      const d = dict[0];
+
+      t.is(d.path, sourceoftruth.path);
+      t.is(d.wd, sourceoftruth.wd);
+    });
+  });
 });
 
 
