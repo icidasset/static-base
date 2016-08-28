@@ -1,7 +1,9 @@
-import pflow from 'pflow';
-
 import { buildDictionary, buildDependencies } from './dictionary';
 import list from './list';
+import pflow from 'pflow';
+
+export * from './dictionary';
+export * from './utils';
 
 
 /**
@@ -51,8 +53,9 @@ function _run(sequenceItems, a, b) {
   if (Array.isArray(a)) {
     dict = a;
 
-    if (dict.length >= 1) pattern = dict[0].pattern;
-    else return Promise.resolve([]);
+    if (dict.length >= 1) {
+      pattern = dict[0].pattern;
+    }
 
   // If given a pattern and root directory
   } else if (
@@ -96,30 +99,45 @@ The pflow library handles the promises for this sequence.
 
 
 function sequence(items, pattern) {
+  const sequenceId = `'${constructSequenceId(items)}' (pattern: '${pattern}')`;
+
   return items.map((item, idx) => {
     return (rvaluePrevious) => {
-      const formattedItem = (typeof item === 'object' ? item : [item]);
-      const fn = formattedItem[0];
-      const fnArgs = [rvaluePrevious, ...formattedItem.slice(1)];
+      const formattedItem = (Array.isArray(item) ? item : [item]);
+      const [fn, ...itemArgs] = formattedItem;
+      const fnArgs = [rvaluePrevious, ...itemArgs];
 
-      // {check} if fn is not a function
+      // {pre} if fn is not a function
       if (fn instanceof Function === false) {
         return Promise.reject(
-          `Item ${idx + 1} in the sequence '${pattern}' is not a function`
+          `Item ${idx + 1} in the sequence ${sequenceId} is not a function`
         );
       }
 
       // -> continue
       const rvalueCurrent = fn.apply(null, fnArgs);
 
-      // {check} if the same array has been returned, reject
+      // {post} if the same array has been returned, reject
       if (rvaluePrevious === rvalueCurrent) {
         return Promise.reject(
-          `Item ${idx + 1} in the sequence '${pattern}' does not return a new array`
+          `Item ${idx + 1} in the sequence '${sequenceId}' does not return a new array`
         );
       }
 
+      // -> continue
       return rvalueCurrent;
     };
   });
+}
+
+
+function constructSequenceId(items) {
+  if (!items.length) return '[]';
+
+  const functionNames = items.map(item => {
+    const fn = (Array.isArray(item) ? item[0] : item);
+    return fn ? fn.name || 'anonymous_fn' : 'undefined_fn';
+  });
+
+  return `[${functionNames.join(', ')}]`;
 }

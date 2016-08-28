@@ -1,3 +1,4 @@
+import { cleanPath } from './utils';
 import glob from 'glob';
 
 
@@ -7,13 +8,14 @@ import glob from 'glob';
  * @param {Dependencies} deps
  * @return {string[]} List of file paths relative from deps.wd (paths)
  */
-export default function(pattern, deps) {
+export default function list(pattern, deps) {
   return new Promise((resolve, reject) => {
     glob(pattern, { cwd: deps.root }, (err, matches) => {
       if (err) return reject(err);
 
-      const matchesWithoutWorkDirectory = matches.map((p) => {
-        return p.replace(new RegExp(`^\/?${deps.wd}\/?`), '');
+      const matchesWithoutWorkDirectory = matches.map(path => {
+        const regex = new RegExp(`^${deps.wd}\/+`);
+        return cleanPath(path, { beginning: true }).replace(regex, '');
       });
 
       resolve(matchesWithoutWorkDirectory);

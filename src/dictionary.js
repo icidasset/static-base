@@ -1,7 +1,6 @@
+import { cleanPath } from './utils';
 import globParent from 'glob-parent';
 import pathUtils from 'path';
-
-import { cleanPath } from './utils';
 
 
 /**
