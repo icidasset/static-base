@@ -120,7 +120,7 @@ function sequence(items, pattern) {
       // {post} if the same array has been returned, reject
       if (rvaluePrevious === rvalueCurrent) {
         return Promise.reject(
-          `Item ${idx + 1} in the sequence '${sequenceId}' does not return a new array`
+          `Item ${idx + 1} in the sequence ${sequenceId} does not return a new array`
         );
       }
 
